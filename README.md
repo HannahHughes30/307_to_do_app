@@ -1,18 +1,28 @@
-// Contributing
-To maintain a consistent code style across the PromiseRejectionEvent, we are using the following tools:
-    1. ESLint for JavaScript and React linting 
-        a. ESLint will flag programming errors, style errors, unused variables, etc.  
-    2. Prettier for code formatting
+## Contributing
 
-// Ensure IDE plugins are installed
-    // installing the Prettier plugin formats your code on save, do not need to manually format every time 
-    1. Install IDE plugin for Prettier
+To maintain a consistent code style across the project, we are using the following tools:
 
-    // installing the ESLint plugin shows errors/warnings instantly, do not need to manually run every time
-    2. Install IDE plugin for  ESLint
+1. **ESLint** for JavaScript and React linting  
+   - ESLint will flag programming errors, style issues, and unused variables.
 
-// Run ESLint on code
-    npm run lint 
+2. **Prettier** for automatic code formatting
 
-// Format code with Prettier 
-    npm run format 
+---
+
+## IDE Plugin Setup
+
+To avoid manual formatting and linting:
+
+1. Install the Prettier plugin for your IDE (e.g., VSCode). This will format your code on save.
+2. Install the ESLint plugin. This will show linting errors/warnings instantly as you type.
+
+---
+
+## Commands
+
+- **Run ESLint**:  
+  npm run lint
+
+- **Run Prettier**:  
+  npm run format
+
