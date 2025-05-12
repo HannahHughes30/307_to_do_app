@@ -66,7 +66,33 @@ function MyApp() {
   }
 
   return (
-    <div className="container">
+    <div className="pink-background">
+      <div className="title-box">
+        <h1>CrumbList 🥖</h1>
+      </div>
+  
+      <div className="category-grid">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="category-box">
+            Category {i + 1}
+          </div>
+        ))}
+      </div>
+  
+{/* Button + Butter Tasks row */}
+<div className="butter-row">
+  <div className="butter-tasks">
+    <div className="butter-title">🧈 Butter Tasks</div>
+    <textarea
+      className="butter-input"
+      placeholder="Write a quick task..."
+    ></textarea>
+  </div>
+
+  <button className="calendar-button">Calendar View</button>
+</div>
+
+  
       <Table characterData={characters} removeCharacter={removeOneCharacter} />
       <Form handleSubmit={updateList} />
     </div>

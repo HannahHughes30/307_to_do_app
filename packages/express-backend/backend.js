@@ -5,8 +5,7 @@ import userService from "./user-services.js";
 const app = express();
 const port = 8000;
 
-app.use(cors()); // allows backend to respond to calls coming from diff ports (frontend and backend are on diff ports for example)
-
+app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -20,7 +19,10 @@ app.get("/users/:id", (req, res) => {
       if (!user) return res.status(404).send("user not found");
       res.send(user);
     })
-    .catch((err) => res.status(500).send("error fetching user"));
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("error fetching user");
+    });
 });
 
 app.get("/users", (req, res) => {
@@ -37,8 +39,13 @@ app.get("/users", (req, res) => {
 app.post("/users", (req, res) => {
   userService
     .addUser(req.body)
-    .then((newUser) => res.status(201).send(newUser))
-    .catch((err) => res.status(400).send("error adding user"));
+    .then((newUser) => {
+      res.status(201).json(newUser);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(400).send("error adding user");
+    });
 });
 
 app.delete("/users/:id", (req, res) => {
@@ -46,7 +53,7 @@ app.delete("/users/:id", (req, res) => {
     .deleteUserById(req.params.id)
     .then((deleted) => {
       if (!deleted) return res.status(404).send("user not found");
-      res.status(204).send(); // no content, success ayeeee
+      res.status(204).send();
     })
     .catch((err) => {
       console.error(err);
