@@ -1,18 +1,27 @@
 import React, { useState, useEffect } from "react";
-import Table from "./Table";
-import Form from "./Form";
+import TaskInputForm from "./TaskInputForm";
 
 function MyApp() {
-  const [characters, setCharacters] = useState([]);
+  // creating a tasks state to keep track of all tasks locally 
+  const [tasks, setTasks] = useState([]); 
 
-  function removeOneCharacter(id) {
-    fetch(`http://localhost:8000/users/${id}`, {
+  const categories = [
+    { name: "School" },
+    { name: "Work" },
+    { name: "Errands" },
+    { name: "Health" },
+    { name: "Fitness" },
+    { name: "Chores" },
+  ];
+
+  // Remove a task by ID
+  function removeTask(id) {
+    fetch(`http://localhost:8000/tasks/${id}`, {
       method: "DELETE",
     })
       .then((res) => {
         if (res.status === 204) {
-          const updated = characters.filter((user) => user._id !== id);
-          setCharacters(updated);
+          setTasks(tasks.filter((task) => task._id !== id));
         } else {
           console.error("Delete failed");
         }
@@ -22,79 +31,79 @@ function MyApp() {
       });
   }
 
-  function fetchUsers() {
-    const promise = fetch("http://localhost:8000/users");
-    return promise;
-  }
-
+  // Fetch all tasks
   useEffect(() => {
-    fetchUsers()
+    fetch("http://localhost:8000/tasks")
       .then((res) => res.json())
-      .then((json) => setCharacters(json["users_list"]))
+      .then((json) => setTasks(json["task_list"]))
       .catch((error) => {
         console.log(error);
       });
   }, []);
 
-  function postUser(person) {
-    const promise = fetch("http://localhost:8000/users", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(person),
-    });
+  // Add a new task
+  function addTask(task) {
+    setTasks((prevTasks) => [...prevTasks, task]);
 
-    return promise;
+    // fetch("http://localhost:8000/tasks", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify(task),
+    // })
+    //   .then((res) => {
+    //     if (res.status === 201) return res.json();
+    //     throw new Error("Failed to create task");
+    //   })
+    //   .then((newTask) => setTasks([...tasks, newTask]))
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
   }
 
-  function updateList(person) {
-    postUser(person)
-      .then((res) => {
-        if (res.status === 201) {
-          return res.json(); // getting newly created ID
-        } else {
-          throw new Error("Failed to create user");
-        }
-      })
-      .then((newUser) => {
-        setCharacters([...characters, newUser]); // now includes ID
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
+
 
   return (
     <div className="pink-background">
       <div className="title-box">
         <h1>CrumbList 🥖</h1>
       </div>
-  
+
       <div className="category-grid">
-        {[...Array(6)].map((_, i) => (
+        {categories.map((cat, i) => (
           <div key={i} className="category-box">
-            Category {i + 1}
+            {cat.name}
           </div>
         ))}
       </div>
-  
-{/* Button + Butter Tasks row */}
-<div className="butter-row">
-  <div className="butter-tasks">
-    <div className="butter-title">🧈 Butter Tasks</div>
-    <textarea
-      className="butter-input"
-      placeholder="Write a quick task..."
-    ></textarea>
-  </div>
 
-  <button className="calendar-button">Calendar View</button>
-</div>
+      <div className="butter-row">
+        <div className="butter-tasks">
+          <div className="butter-title">🧈 Butter Tasks</div>
+          <textarea
+            className="butter-input"
+            placeholder="Write a quick task..."
+          ></textarea>
+        </div>
+        <button className="calendar-button">Calendar View</button>
+      </div>
 
-  
-      <Table characterData={characters} removeCharacter={removeOneCharacter} />
-      <Form handleSubmit={updateList} />
+      <TaskInputForm categories={categories} onSubmit={addTask} />
+
+      <div className="task-preview">
+        <h2>Task Preview</h2>
+        <ul>
+          {tasks.map((task, idx) => (
+            <li key={idx}>
+              <strong>{task.title}</strong> | {task.category} | {task.dueDate} | {task.expectedTime} mins  
+              <br />
+              Notes: {task.notes}
+            </li>
+          ))}
+        </ul>
+       </div>
+
     </div>
   );
 }
