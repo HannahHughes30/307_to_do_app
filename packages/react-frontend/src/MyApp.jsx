@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import TaskInputForm from "./TaskInputForm";
+import { useNavigate } from "react-router-dom";
 
 function MyApp() {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState([]); 
+  const navigate = useNavigate();
   const [quote, setQuote] = useState("Loading quote...");
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState("");
@@ -22,6 +24,21 @@ function MyApp() {
     { name: "Chores" },
   ];
 
+  function removeTask(id) {
+    fetch(`http://localhost:8000/tasks/${id}`, {
+      method: "DELETE",
+    })
+      .then((res) => {
+        if (res.status === 204) {
+          setTasks(tasks.filter((task) => task._id !== id));
+        } else {
+          console.error("Delete failed");
+        }
+      })
+      .catch((error) => {
+        console.error("Delete failed:", error);
+      });
+  }
   const butterTasks = tasks.filter((task) => Number(task.expectedTime) < 60);
   const normalTasks = tasks.filter((task) => Number(task.expectedTime) >= 60);
 
@@ -89,6 +106,7 @@ function MyApp() {
   }, [checkedTasks, butterTasks, normalTasks]);
 
   function addTask(task) {
+    setTasks((prevTasks) => [...prevTasks, task]);
     setTasks((prev) => [...prev, task]);
   }
 
@@ -169,6 +187,22 @@ function MyApp() {
             ))}
           </div>
 
+      <div className="butter-row">
+        <div className="butter-tasks">
+          <div className="butter-title">🧈 Butter Tasks</div>
+          <textarea
+            className="butter-input"
+            placeholder="Write a quick task..."
+          ></textarea>
+        </div>
+
+        <div className="button-col">
+          <button className="add-task-button" onClick={() => navigate('/add-task')}>
+            Add Task
+          </button>
+          <button className="calendar-button">Calendar View</button>
+        </div>
+      </div>
           {/* Butter Tasks */}
           <div className="butter-row">
             <div className="butter-tasks">
@@ -201,6 +235,18 @@ function MyApp() {
             <button className="calendar-button">Calendar View</button>
           </div>
 
+      {/* <div className="task-preview">
+        <h2>Task Preview</h2>
+        <ul>
+          {tasks.map((task, idx) => (
+            <li key={idx}>
+              <strong>{task.title}</strong> | {task.category} | {task.dueDate} | {task.expectedTime} mins  
+              <br />
+              Notes: {task.notes}
+            </li>
+          ))}
+        </ul>
+      </div> */}
           {/* Normal Tasks */}
           {normalTasks.length > 0 && (
             <div className="normal-tasks">
