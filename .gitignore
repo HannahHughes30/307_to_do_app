@@ -1,0 +1,24 @@
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+dist/
+build/
+
+# Logs
+logs/
+*.log
+
+# dotenv
+.env
+.env.local
+
+# macOS
+.DS_Store
+
+# Vite
+.vite/
+
+# Optional: ignore IDE/editor config
+.vscode/
+.idea/
