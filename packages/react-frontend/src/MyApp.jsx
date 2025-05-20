@@ -187,6 +187,25 @@ function MyApp() {
             ))}
           </div>
 
+  
+  
+
+      {/* <div className="butter-row">
+        <div className="butter-tasks">
+          <div className="butter-title">🧈 Butter Tasks</div>
+          <textarea
+            className="butter-input"
+            placeholder="Write a quick task..."
+          ></textarea>
+        </div>
+
+        <div className="button-col">
+          <button className="add-task-button" onClick={() => navigate('/add-task')}>
+            Add Task
+          </button>
+          <button className="calendar-button">Calendar View</button>
+        </div>
+      </div> */}
           {/* Butter Tasks */}
           <div className="butter-row">
             <div className="butter-tasks">
@@ -216,7 +235,14 @@ function MyApp() {
                 </button>
               )}
             </div>
+            <div className="button-col">
+              <button className="add-task-button" onClick={() => navigate('/add-task')}>
+                Add Task
+              </button>
             <button className="calendar-button">Calendar View</button>
+          </div>
+
+            {/* <button className="calendar-button">Calendar View</button> */}
           </div>
 
       {/* <div className="task-preview">
@@ -246,7 +272,7 @@ function MyApp() {
           )}
 
           {/* Task Input */}
-          <TaskInputForm categories={categories} onSubmit={addTask} />
+          {/* <TaskInputForm categories={categories} onSubmit={addTask} /> */}
 
           {/* ✅ Quote Box */}
           <div className="quote-box">

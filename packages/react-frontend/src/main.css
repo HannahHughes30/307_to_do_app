@@ -1559,6 +1559,13 @@ caption {
   transform: scale(1.02);
 }
 
+/* .add-task-controls {
+  display: flex;
+  justify-content: flex-end;
+  max-width: 700px;
+  margin: 1rem auto;
+  padding: 0 1rem;
+} */
 
 
 
