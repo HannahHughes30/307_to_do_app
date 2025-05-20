@@ -5,8 +5,7 @@ import taskFunction from "./task-functions.js";
 const app = express();
 const port = 8000;
 
-app.use(cors()); // allows backend to respond to calls coming from diff ports (frontend and backend are on diff ports for example)
-
+app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -22,7 +21,7 @@ app.get("/tasks/:id", (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      res.status(500).send("error fetching tasks");
+      res.status(500).send("error fetching user");
     });
 });
 
