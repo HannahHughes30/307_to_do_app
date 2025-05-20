@@ -39,8 +39,8 @@ function findTaskByUrgency(urgency) {
 }
 
 function findTaskByEase(ease) {
-    return taskModel.find({ ease: ease });
-  }
+  return taskModel.find({ ease: ease });
+}
 
 function deleteTaskById(id) {
   return taskModel.findByIdAndDelete(id);

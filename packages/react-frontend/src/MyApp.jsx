@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import TaskInputForm from "./TaskInputForm";
 import { useNavigate } from "react-router-dom";
 
 function MyApp() {
-  const [tasks, setTasks] = useState([]); 
+  const [tasks, setTasks] = useState([]);
   const navigate = useNavigate();
   const [quote, setQuote] = useState("Loading quote...");
   const [progress, setProgress] = useState(0);
@@ -24,21 +23,21 @@ function MyApp() {
     { name: "Chores" },
   ];
 
-  function removeTask(id) {
-    fetch(`http://localhost:8000/tasks/${id}`, {
-      method: "DELETE",
-    })
-      .then((res) => {
-        if (res.status === 204) {
-          setTasks(tasks.filter((task) => task._id !== id));
-        } else {
-          console.error("Delete failed");
-        }
-      })
-      .catch((error) => {
-        console.error("Delete failed:", error);
-      });
-  }
+  // function removeTask(id) {
+  //   fetch(`http://localhost:8000/tasks/${id}`, {
+  //     method: "DELETE",
+  //   })
+  //     .then((res) => {
+  //       if (res.status === 204) {
+  //         setTasks(tasks.filter((task) => task._id !== id));
+  //       } else {
+  //         console.error("Delete failed");
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error("Delete failed:", error);
+  //     });
+  // }
   const butterTasks = tasks.filter((task) => Number(task.expectedTime) < 60);
   const normalTasks = tasks.filter((task) => Number(task.expectedTime) >= 60);
 
@@ -78,13 +77,18 @@ function MyApp() {
       "Break your big goals into little slices.",
       "All good things start with one crumb.",
     ];
-    const fallback = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
+    const fallback =
+      fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
 
     fetch("https://type.fit/api/quotes")
       .then((res) => res.json())
       .then((data) => {
         const random = data[Math.floor(Math.random() * data.length)];
-        setQuote(random?.text ? `${random.text} – Mr. Crumb` : `${fallback} – Mr. Crumb`);
+        setQuote(
+          random?.text
+            ? `${random.text} – Mr. Crumb`
+            : `${fallback} – Mr. Crumb`,
+        );
       })
       .catch(() => setQuote(`${fallback} – Mr. Crumb`));
   }, []);
@@ -105,16 +109,16 @@ function MyApp() {
     }
   }, [checkedTasks, butterTasks, normalTasks]);
 
-  function addTask(task) {
-    setTasks((prevTasks) => [...prevTasks, task]);
-    setTasks((prev) => [...prev, task]);
-  }
+  // function addTask(task) {
+  //   setTasks((prevTasks) => [...prevTasks, task]);
+  //   setTasks((prev) => [...prev, task]);
+  // }
 
   function toggleChecked(taskId) {
     setCheckedTasks((prev) =>
       prev.includes(taskId)
         ? prev.filter((id) => id !== taskId)
-        : [...prev, taskId]
+        : [...prev, taskId],
     );
   }
 
@@ -139,18 +143,41 @@ function MyApp() {
   return (
     <div className={`pink-background ${darkMode ? "dark-mode" : ""}`}>
       {/* Hamburger Menu */}
-      <div className="hamburger-menu" onClick={() => setSidebarOpen(!sidebarOpen)}>
+      <div
+        className="hamburger-menu"
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+      >
         ☰
       </div>
 
       {/* Sidebar */}
       <div ref={sidebarRef} className={`sidebar ${sidebarOpen ? "open" : ""}`}>
-        <button className="sidebar-close" onClick={() => setSidebarOpen(false)}>×</button>
+        <button className="sidebar-close" onClick={() => setSidebarOpen(false)}>
+          ×
+        </button>
         <ul>
-          <li><button className="sidebar-link" onClick={() => setActivePage("home")}>🏠 Home</button></li>
-          <li><button className="sidebar-link">📆 Calendar View</button></li>
-          <li><button className="sidebar-link">👤 Profile</button></li>
-          <li><button className="sidebar-link" onClick={() => setActivePage("settings")}>⚙️ Settings</button></li>
+          <li>
+            <button
+              className="sidebar-link"
+              onClick={() => setActivePage("home")}
+            >
+              🏠 Home
+            </button>
+          </li>
+          <li>
+            <button className="sidebar-link">📆 Calendar View</button>
+          </li>
+          <li>
+            <button className="sidebar-link">👤 Profile</button>
+          </li>
+          <li>
+            <button
+              className="sidebar-link"
+              onClick={() => setActivePage("settings")}
+            >
+              ⚙️ Settings
+            </button>
+          </li>
         </ul>
       </div>
 
@@ -159,7 +186,11 @@ function MyApp() {
         <div className="settings-page">
           <h2>⚙️ Settings</h2>
           <label>
-            <input type="checkbox" checked={darkMode} onChange={() => setDarkMode(!darkMode)} />
+            <input
+              type="checkbox"
+              checked={darkMode}
+              onChange={() => setDarkMode(!darkMode)}
+            />
             Enable Dark Mode
           </label>
           <div className="settings-placeholder">
@@ -183,14 +214,13 @@ function MyApp() {
           {/* Category Grid */}
           <div className="category-grid">
             {categories.map((cat, index) => (
-              <div key={index} className="category-box">{cat.name}</div>
+              <div key={index} className="category-box">
+                {cat.name}
+              </div>
             ))}
           </div>
 
-  
-  
-
-      {/* <div className="butter-row">
+          {/* <div className="butter-row">
         <div className="butter-tasks">
           <div className="butter-title">🧈 Butter Tasks</div>
           <textarea
@@ -230,22 +260,28 @@ function MyApp() {
                 </div>
               )}
               {checkedTasks.length > 0 && (
-                <button className="complete-button" onClick={completeCheckedTasks}>
+                <button
+                  className="complete-button"
+                  onClick={completeCheckedTasks}
+                >
                   ✅ Complete Selected
                 </button>
               )}
             </div>
             <div className="button-col">
-              <button className="add-task-button" onClick={() => navigate('/add-task')}>
+              <button
+                className="add-task-button"
+                onClick={() => navigate("/add-task")}
+              >
                 Add Task
               </button>
-            <button className="calendar-button">Calendar View</button>
-          </div>
+              <button className="calendar-button">Calendar View</button>
+            </div>
 
             {/* <button className="calendar-button">Calendar View</button> */}
           </div>
 
-      {/* <div className="task-preview">
+          {/* <div className="task-preview">
         <h2>Task Preview</h2>
         <ul>
           {tasks.map((task, idx) => (
@@ -283,11 +319,21 @@ function MyApp() {
           <div className="toast-section">
             <h2>Toast Your Tasks…</h2>
             <div className="toast-bar-wrapper">
-              <div className="emoji-fire" style={{ left: `calc(${progress}% - 12px)` }}>🔥</div>
+              <div
+                className="emoji-fire"
+                style={{ left: `calc(${progress}% - 12px)` }}
+              >
+                🔥
+              </div>
               <div className="toast-bar">
-                <div className="toast-fill" style={{ width: `${progress}%` }}></div>
+                <div
+                  className="toast-fill"
+                  style={{ width: `${progress}%` }}
+                ></div>
                 <div className="toast-text">
-                  {progress === 100 ? "100% Completed!" : `Task Progress (${progress}%)`}
+                  {progress === 100
+                    ? "100% Completed!"
+                    : `Task Progress (${progress}%)`}
                 </div>
               </div>
               <span className="emoji-bread">🍞</span>
@@ -301,4 +347,3 @@ function MyApp() {
 }
 
 export default MyApp;
-

@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import PropTypes from "prop-types";
 
 const TaskInputForm = ({ onSubmit, categories }) => {
   const [task, setTask] = useState({
-    title: '',
-    dueDate: '',
-    category: '',
-    notes: '',
-    expectedTime: '',
-    urgency: ''
+    title: "",
+    dueDate: "",
+    category: "",
+    notes: "",
+    expectedTime: "",
+    urgency: "",
   });
 
   const handleChange = (e) => {
@@ -19,12 +20,12 @@ const TaskInputForm = ({ onSubmit, categories }) => {
     e.preventDefault();
     onSubmit(task); // Pass task up
     setTask({
-      title: '',
-      dueDate: '',
-      category: '',
-      notes: '',
-      expectedTime: '',
-      urgency: ''
+      title: "",
+      dueDate: "",
+      category: "",
+      notes: "",
+      expectedTime: "",
+      urgency: "",
     });
   };
 
@@ -57,10 +58,11 @@ const TaskInputForm = ({ onSubmit, categories }) => {
       <select name="urgency" value={task.urgency} onChange={handleChange}>
         <option value="">Select urgency (1 = low, 10 = high)</option>
         {[...Array(10)].map((_, i) => (
-            <option key={i + 1} value={i + 1}>{i + 1}</option>
+          <option key={i + 1} value={i + 1}>
+            {i + 1}
+          </option>
         ))}
       </select>
-
 
       <textarea
         name="notes"
@@ -77,11 +79,21 @@ const TaskInputForm = ({ onSubmit, categories }) => {
         onChange={handleChange}
       />
 
-        <button type="submit" className="add-task-button"> Add Task</button>
-
+      <button type="submit" className="add-task-button">
+        {" "}
+        Add Task
+      </button>
     </form>
-
   );
+};
+
+TaskInputForm.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+  categories: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+    }),
+  ).isRequired,
 };
 
 export default TaskInputForm;

@@ -1053,8 +1053,6 @@ select {
   box-sizing: border-box;
 }
 
-
-
 /* select::-ms-expand {
   display: none;
 } */
@@ -1497,7 +1495,7 @@ caption {
 }
 
 .form-page {
-  background-color: #f49ac2; 
+  background-color: #f49ac2;
   padding: 2rem;
   /* max-width: 600px; */
   margin: 0 auto;
@@ -1515,7 +1513,6 @@ caption {
   text-align: center;
 }
 
-
 .back-button {
   /* margin-top: 1rem; */
   padding: 0.5rem 1rem;
@@ -1528,7 +1525,7 @@ caption {
 }
 
 .back-button:hover {
-  background-color: #ffda77; 
+  background-color: #ffda77;
   transform: scale(1.02);
   transition: all 0.2s ease;
   color: #333;
@@ -1542,14 +1539,14 @@ caption {
 
 /* For form page */
 .add-task-button {
-  background-color: #ffda77; 
+  background-color: #ffda77;
   color: #333;
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
-  margin-top: 1rem; 
+  margin-top: 1rem;
   transition: all 0.2s ease;
 }
 
@@ -1558,16 +1555,6 @@ caption {
   color: #333;
   transform: scale(1.02);
 }
-
-
-
-
-
-
-
-
-
-
 
 /*
  * Navigation

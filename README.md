@@ -2,7 +2,8 @@
 
 To maintain a consistent code style across the project, we are using the following tools:
 
-1. **ESLint** for JavaScript and React linting  
+1. **ESLint** for JavaScript and React linting
+
    - ESLint will flag programming errors, style issues, and unused variables.
 
 2. **Prettier** for automatic code formatting
@@ -25,4 +26,3 @@ To avoid manual formatting and linting:
 
 - **Run Prettier**:  
   npm run format
-

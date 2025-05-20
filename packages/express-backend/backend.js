@@ -63,14 +63,6 @@ app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
 
-
-
-
-
-
-
-
-
 // import express from "express";
 // import cors from "cors";
 // import userService from "./user-services.js";
