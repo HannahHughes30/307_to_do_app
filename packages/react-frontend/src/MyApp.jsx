@@ -187,22 +187,6 @@ function MyApp() {
             ))}
           </div>
 
-      <div className="butter-row">
-        <div className="butter-tasks">
-          <div className="butter-title">🧈 Butter Tasks</div>
-          <textarea
-            className="butter-input"
-            placeholder="Write a quick task..."
-          ></textarea>
-        </div>
-
-        <div className="button-col">
-          <button className="add-task-button" onClick={() => navigate('/add-task')}>
-            Add Task
-          </button>
-          <button className="calendar-button">Calendar View</button>
-        </div>
-      </div>
           {/* Butter Tasks */}
           <div className="butter-row">
             <div className="butter-tasks">
