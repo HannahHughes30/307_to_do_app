@@ -23,4 +23,3 @@ To avoid manual formatting and linting:
 
 - **Run ESLint and Prettier**:  
   npm run lint
-

@@ -1,5 +1,44 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
+
+const EditableCategory = ({ name, index, onNameChange }) => {
+  const [editing, setEditing] = useState(false);
+  const [tempName, setTempName] = useState(name);
+
+  const handleBlur = () => {
+    setEditing(false);
+    onNameChange(index, tempName);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      setEditing(false);
+      onNameChange(index, tempName);
+    }
+  };
+
+  return editing ? (
+    <input
+      type="text"
+      value={tempName}
+      autoFocus
+      onChange={(e) => setTempName(e.target.value)}
+      onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
+      className="category-input"
+    />
+  ) : (
+    <div
+      onClick={() => setEditing(true)}
+      className="category-box"
+      style={{ cursor: "pointer" }}
+    >
+      {name || <em>Click to name me</em>}
+    </div>
+  );
+};
 
 function MyApp() {
   const [tasks, setTasks] = useState([]);
@@ -20,7 +59,7 @@ function MyApp() {
     { name: "" },
     { name: "" },
     { name: "" },
-    { name: "" }
+    { name: "" },
   ]);
 
   // function removeTask(id) {
@@ -139,46 +178,6 @@ function MyApp() {
       }
     });
   }
-
-  const EditableCategory = ({ name, index, onNameChange }) => {
-    const [editing, setEditing] = useState(false);
-    const [tempName, setTempName] = useState(name);
-
-    const handleBlur = () => {
-      setEditing(false);
-      onNameChange(index, tempName);
-    };
-
-    const handleKeyDown = (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        setEditing(false);
-        onNameChange(index, tempName);
-      }
-    };
-
-    return editing ? (
-      <input
-        type="text"
-        value={tempName}
-        autoFocus
-        onChange={(e) => setTempName(e.target.value)}
-        onBlur={handleBlur}
-        onKeyDown={handleKeyDown}
-        className="category-input"
-      />
-    ) : (
-      <div
-        onClick={() => setEditing(true)}
-        className="category-box"
-        style={{ cursor: "pointer" }}
-      >
-        {name || <em>Click to name me</em>}
-      </div>
-    );
-
-  };
-
 
   return (
     <div className={`pink-background ${darkMode ? "dark-mode" : ""}`}>
@@ -377,5 +376,10 @@ function MyApp() {
   );
 }
 
-export default MyApp;
+EditableCategory.propTypes = {
+  name: PropTypes.string.isRequired,
+  index: PropTypes.number.isRequired,
+  onNameChange: PropTypes.func.isRequired,
+};
 
+export default MyApp;
