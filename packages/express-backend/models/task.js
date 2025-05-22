@@ -14,40 +14,33 @@ const TaskSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      required: true,
       trim: true,
     },
     due_date: {
       type: Date,
       required: true,
-      trim: true,
-      validate(value) {
-        if (value > new Date())
-          throw new Error("Invalid Due Date, must be due in the future.");
-      },
     },
     urgency: {
       type: Number,
       required: true,
-      trim: true,
       validate(value) {
-        if (value >= 0 && value <= 10)
-          throw new Error("Invalid Urgency, must be a number between 0 and 10");
+        if (value < 1 || value > 10) {
+          throw new Error("Invalid Urgency, must be a number between 1 and 10");
+        }
       },
     },
     ease: {
       type: Number,
       required: true,
-      trim: true,
       validate(value) {
-        if (value >= 0 && value <= 10)
-          throw new Error("Invalid Ease, must be a number between 0 and 10");
+        if (value < 1) {
+          throw new Error("Invalid Ease, must be a positive number (minutes)");
+        }
       },
     },
   },
-  { collection: "task_list" },
+  { collection: "task_list" }
 );
 
 const Task = mongoose.model("Task", TaskSchema);
-
 export default Task;

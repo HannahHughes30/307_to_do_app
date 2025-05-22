@@ -1,17 +1,18 @@
 import mongoose from "mongoose";
 import taskModel from "./models/task.js";
 import dotenv from "dotenv";
+
 dotenv.config();
 
-// mongoose.set("debug", true);
-
+// ✅ Fix the environment variable name
 mongoose
-  .connect(process.env.MONGODB_URI, {
+  .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .catch((error) => console.log(error));
+  .catch((error) => console.log("MongoDB connection error:", error));
 
+// ✅ Get tasks, optionally filtered by due_date, urgency, or ease
 function getTasks(due_date, urgency, ease) {
   const filter = {};
   if (due_date) filter.due_date = due_date;
@@ -26,8 +27,7 @@ function findTaskById(id) {
 
 function addTask(task) {
   const taskToAdd = new taskModel(task);
-  const promise = taskToAdd.save();
-  return promise;
+  return taskToAdd.save();
 }
 
 function findTaskByDueDate(due_date) {
@@ -55,3 +55,4 @@ export default {
   findTaskByEase,
   deleteTaskById,
 };
+

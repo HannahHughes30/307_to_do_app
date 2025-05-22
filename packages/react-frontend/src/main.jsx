@@ -1,14 +1,12 @@
 import React from "react";
-import ReactDOMClient from "react-dom/client";
-import MyApp from "./MyApp";
+import { createRoot } from "react-dom/client";
 import "./main.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import TaskFormPage from "./TaskFormPage.jsx"; // create this next
+import MyApp from "./MyApp";
+import TaskFormPage from "./TaskFormPage";
 
 const container = document.getElementById("root");
-
-// Create a root
-const root = ReactDOMClient.createRoot(container);
+const root = createRoot(container);
 
 root.render(
   <React.StrictMode>
@@ -18,5 +16,5 @@ root.render(
         <Route path="/add-task" element={<TaskFormPage />} />
       </Routes>
     </BrowserRouter>
-  </React.StrictMode>,
+  </React.StrictMode>
 );
