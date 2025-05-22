@@ -1,9 +1,9 @@
+import dotenv from "dotenv";
 import mongoose from "mongoose";
 import userModel from "./models/user.js";
-import dotenv from "dotenv";
 dotenv.config();
 
-// mongoose.set("debug", true);
+console.log("MONGO_URI:", process.env.MONGO_URI);
 
 mongoose
   .connect(process.env.MONGO_URI, {
