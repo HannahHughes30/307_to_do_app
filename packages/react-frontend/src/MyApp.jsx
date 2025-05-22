@@ -1,5 +1,46 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
+
+const EditableCategory = ({ name, index, onNameChange, taskCount, onClick }) => {
+  const [editing, setEditing] = useState(false);
+  const [tempName, setTempName] = useState(name);
+
+  const handleBlur = () => {
+    setEditing(false);
+    onNameChange(index, tempName);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      setEditing(false);
+      onNameChange(index, tempName);
+    }
+  };
+
+  return editing ? (
+    <input
+      type="text"
+      value={tempName}
+      autoFocus
+      onChange={(e) => setTempName(e.target.value)}
+      onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
+      className="category-input"
+    />
+  ) : (
+    <div
+      onClick={() => name ? onClick() : setEditing(true)}
+      className="category-box"
+      style={{ cursor: "pointer" }}
+    >
+      <h3>{name || <em>Click to name me</em>}</h3>
+      {name && <p className="task-count">({taskCount} tasks)</p>}
+    </div>
+  );
+};
+
 
 function MyApp() {
   const [tasks, setTasks] = useState([]);
@@ -12,14 +53,14 @@ function MyApp() {
   const navigate = useNavigate();
   const sidebarRef = useRef();
 
-  const categories = [
-    { name: "School" },
-    { name: "Work" },
-    { name: "Errands" },
-    { name: "Health" },
-    { name: "Fitness" },
-    { name: "Chores" },
-  ];
+  const [categories, setCategories] = useState([
+    { name: "" },
+    { name: "" },
+    { name: "" },
+    { name: "" },
+    { name: "" },
+    { name: "" }
+  ]);
 
   // Separate tasks by ease (expectedTime equivalent)
   const butterTasks = tasks.filter((task) => Number(task.ease) < 60);
@@ -244,17 +285,21 @@ function MyApp() {
 
       {/* Category Grid */}
       <div className="category-grid">
-        {categories.map((cat, index) => (
-          <div
-            key={index}
-            className="category-box"
-            onClick={() => openCategoryModal(cat.name)}
-            style={{ cursor: "pointer" }}
-          >
-            <h3>{cat.name}</h3>
-            <p className="task-count">({tasksByCategory[cat.name].length} tasks)</p>
-          </div>
-        ))}
+      {categories.map((cat, index) => (
+        <EditableCategory
+          key={index}
+          name={cat.name}
+          index={index}
+          onNameChange={(i, newName) => {
+            const updated = [...categories];
+            updated[i].name = newName;
+            setCategories(updated);
+          }}
+          taskCount={tasksByCategory[cat.name]?.length || 0}
+          onClick={() => openCategoryModal(cat.name)}
+        />
+      ))}
+
       </div>
 
       {/* Category Modal */}
@@ -354,9 +399,17 @@ function MyApp() {
       </div>
 
         </>
-      )}
+      )}   
     </div>
   );
 }
+
+EditableCategory.propTypes = {
+  name: PropTypes.string.isRequired,
+  index: PropTypes.number.isRequired,
+  onNameChange: PropTypes.func.isRequired,
+  taskCount: PropTypes.number,
+  onClick: PropTypes.func,
+};
 
 export default MyApp;
