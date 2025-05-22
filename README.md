@@ -21,5 +21,8 @@ To avoid manual formatting and linting:
 
 ## Commands
 
-- **Run ESLint and Prettier**:  
+- **Run ESLint **:  
   npm run lint
+
+- **Run Prettier **:  
+  npm run format
