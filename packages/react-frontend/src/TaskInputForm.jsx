@@ -18,7 +18,21 @@ const TaskInputForm = ({ onSubmit, categories }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(task); // Pass task up
+    
+    // Map frontend fields to backend schema
+    const backendTask = {
+      name: task.title,
+      category: task.category,
+      description: task.notes,
+      due_date: task.dueDate,
+      urgency: Number(task.urgency),
+      ease: Number(task.expectedTime.replace(/\D/g, '')) || Number(task.expectedTime), // Remove non-digits
+    };
+
+    console.log("Submitting task:", backendTask);
+    onSubmit(backendTask);
+    
+    // Clear form
     setTask({
       title: "",
       dueDate: "",
@@ -37,25 +51,24 @@ const TaskInputForm = ({ onSubmit, categories }) => {
         placeholder="Task title"
         value={task.title}
         onChange={handleChange}
+        required
       />
-
       <input
         type="date"
         name="dueDate"
         value={task.dueDate}
         onChange={handleChange}
+        required
       />
-
-      <select name="category" value={task.category} onChange={handleChange}>
-        <option value="">Select category </option>
+      <select name="category" value={task.category} onChange={handleChange} required>
+        <option value="">Select category</option>
         {categories.map((cat, idx) => (
           <option key={idx} value={cat.name}>
             {cat.name}
           </option>
         ))}
       </select>
-
-      <select name="urgency" value={task.urgency} onChange={handleChange}>
+      <select name="urgency" value={task.urgency} onChange={handleChange} required>
         <option value="">Select urgency (1 = low, 10 = high)</option>
         {[...Array(10)].map((_, i) => (
           <option key={i + 1} value={i + 1}>
@@ -63,24 +76,21 @@ const TaskInputForm = ({ onSubmit, categories }) => {
           </option>
         ))}
       </select>
-
       <textarea
         name="notes"
         placeholder="Notes..."
         value={task.notes}
         onChange={handleChange}
       />
-
       <input
-        type="text"
+        type="number"
         name="expectedTime"
-        placeholder="Expected time (e.g. 30 mins)"
+        placeholder="Expected time in minutes (e.g. 30)"
         value={task.expectedTime}
         onChange={handleChange}
+        required
       />
-
       <button type="submit" className="add-task-button">
-        {" "}
         Add Task
       </button>
     </form>
@@ -92,7 +102,7 @@ TaskInputForm.propTypes = {
   categories: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
-    }),
+    })
   ).isRequired,
 };
 

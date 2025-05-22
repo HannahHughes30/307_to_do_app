@@ -1195,11 +1195,38 @@ caption {
   height: 120px;
   border-radius: 8px;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   color: white;
   font-weight: bold;
   font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.category-box:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.category-box h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+/* Task Count Styling */
+.task-count {
+  font-size: 12px;
+  color: #ddd;
+  font-weight: normal;
+  margin: 5px 0 0 0;
+}
+
+.butter-title .task-count {
+  font-size: 14px;
+  color: #666;
+  font-weight: normal;
 }
 
 /* === Butter Tasks Section === */
@@ -1276,6 +1303,33 @@ caption {
   margin-top: 0.5rem;
 }
 
+/* === Button Column === */
+.button-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+/* For form page */
+.add-task-button {
+  background-color: #ffda77;
+  color: #333;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 180px;
+}
+
+.add-task-button:hover {
+  background-color: #ffd878;
+  color: #333;
+  transform: scale(1.02);
+}
+
 /* === Calendar Button === */
 .calendar-button {
   background-color: #ffda77;
@@ -1300,9 +1354,9 @@ caption {
 
 .toast-bar-wrapper {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 15px;
   margin: 10px auto;
   max-width: 90%;
   position: relative;
@@ -1314,13 +1368,14 @@ caption {
   height: 28px;
   width: 100%;
   position: relative;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .toast-fill {
   background-color: #a0522d;
   height: 100%;
   transition: width 0.4s ease-in-out;
+  border-radius: 12px;
 }
 
 .toast-text {
@@ -1339,10 +1394,7 @@ caption {
 }
 
 .emoji-fire {
-  position: absolute;
-  bottom: -28px;
   font-size: 1.5rem;
-  transition: left 0.4s ease-in-out;
   z-index: 2;
 }
 
@@ -1354,36 +1406,6 @@ caption {
   font-weight: bold;
   margin-top: 10px;
   color: white;
-}
-
-/* === Settings Page === */
-.settings-page {
-  background: #fff8e1;
-  color: #333;
-  padding: 40px;
-  margin: 40px auto;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 600px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
-  text-align: left;
-}
-
-.settings-page h2 {
-  margin-top: 0;
-  font-size: 1.6rem;
-}
-
-.settings-page label {
-  display: block;
-  margin: 20px 0;
-  font-size: 1.1rem;
-  font-weight: 500;
-}
-
-.settings-placeholder {
-  font-size: 0.95rem;
-  margin-top: 20px;
 }
 
 /* === Sidebar & Hamburger === */
@@ -1434,16 +1456,229 @@ caption {
   margin-top: 50px;
 }
 
+.sidebar li {
+  margin: 10px 0;
+}
+
 .sidebar-link {
   display: block;
   background: none;
   color: white;
   border: none;
   font-size: 1.1rem;
-  padding: 10px 0;
+  padding: 15px 0;
   text-align: left;
   width: 100%;
   cursor: pointer;
+  border-bottom: 1px solid #555;
+}
+
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffda77;
+}
+
+/* === Pages === */
+.settings-page, .calendar-page, .profile-page {
+  background: #fff8e1;
+  color: #333;
+  padding: 40px;
+  margin: 40px auto;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  text-align: left;
+}
+
+.settings-page h2, .calendar-page h2, .profile-page h2 {
+  margin-top: 0;
+  font-size: 1.6rem;
+  color: #8B4513;
+}
+
+.settings-page label {
+  display: block;
+  margin: 20px 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.settings-placeholder, .calendar-placeholder, .profile-placeholder {
+  font-size: 0.95rem;
+  margin-top: 20px;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* === Modal Styles === */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 70vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: #8B4513;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-button:hover {
+  color: #333;
+  background: #f0f0f0;
+  border-radius: 50%;
+}
+
+.modal-body {
+  padding: 0;
+}
+
+.modal-task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.modal-task-list li {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: flex-start;
+}
+
+.modal-task-list li:last-child {
+  border-bottom: none;
+}
+
+.modal-task-list label {
+  display: flex;
+  align-items: flex-start;
+  cursor: pointer;
+  width: 100%;
+}
+
+.modal-task-list input[type="checkbox"] {
+  margin-right: 10px;
+  margin-top: 3px;
+}
+
+.modal-task-list strong {
+  color: #8B4513;
+}
+
+.modal-task-list p {
+  margin: 5px 0 0 0;
+  color: #666;
+  font-size: 14px;
+}
+
+/* === Motivational Quote Box === */
+.quote-box {
+  background: #fff3cd;
+  border-left: 5px solid #ffc107;
+  padding: 15px 20px;
+  margin: 20px auto;
+  width: 80%;
+  font-style: italic;
+  color: #333;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.form-page {
+  background-color: #f49ac2;
+  padding: 2rem;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.form-heading {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.form-buttons {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.back-button {
+  padding: 0.5rem 1rem;
+  color: #333;
+  background-color: #ffda77;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.back-button:hover {
+  background-color: #ffd878;
+  transform: scale(1.02);
+  transition: all 0.2s ease;
+  color: #333;
+}
+
+.normal-task-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+}
+
+.normal-task-list li {
+  margin: 0.25rem 0;
+  font-weight: normal;
+  font-size: 0.95rem;
+  color: white;
 }
 
 /* === Dark Mode === */
@@ -1461,7 +1696,9 @@ caption {
 }
 
 .dark-mode .quote-box,
-.dark-mode .settings-page {
+.dark-mode .settings-page,
+.dark-mode .calendar-page,
+.dark-mode .profile-page {
   background-color: #2c2c2c;
   color: #f5f5f5;
   border-color: #555;
@@ -1475,85 +1712,51 @@ caption {
   background-color: #2c2c2c;
   color: white;
 }
-/* === Motivational Quote Box === */
-.quote-box {
-  background: #fff3cd;
-  border-left: 5px solid #ffc107;
-  padding: 15px 20px;
-  margin: 20px auto;
-  width: 80%;
-  font-style: italic;
-  color: #333;
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
 
-.dark-mode .quote-box {
-  background: #2c2c2c;
-  color: #f5f5f5;
-  border-color: #ffda77;
-}
-
-.form-page {
-  background-color: #f49ac2;
+/* Task Form Styles */
+.task-form {
+  background: white;
   padding: 2rem;
-  /* max-width: 600px; */
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: left;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 100%;
 }
 
-.form-heading {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 2rem;
-  text-align: center;
+.task-form input,
+.task-form select,
+.task-form textarea {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
 }
 
-.back-button {
-  /* margin-top: 1rem; */
-  padding: 0.5rem 1rem;
-  color: #333;
-  background-color: #ffda77;
+.task-form input:focus,
+.task-form select:focus,
+.task-form textarea:focus {
+  border-color: #8B4513;
+  outline: none;
+}
+
+.task-form button {
+  width: 100%;
+  padding: 12px;
+  background: #8B4513;
+  color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
+  font-size: 16px;
   font-weight: bold;
   cursor: pointer;
+  margin-top: 10px;
 }
 
-.back-button:hover {
-  background-color: #ffda77;
-  transform: scale(1.02);
-  transition: all 0.2s ease;
-  color: #333;
-}
-
-.button-col {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* or center */
-}
-
-/* For form page */
-.add-task-button {
-  background-color: #ffda77;
-  color: #333;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 1rem;
-  transition: all 0.2s ease;
-}
-
-.add-task-button:hover {
-  background-color: #ffd878;
-  color: #333;
-  transform: scale(1.02);
+.task-form button:hover {
+  background: #A0522D;
 }
 
 /*

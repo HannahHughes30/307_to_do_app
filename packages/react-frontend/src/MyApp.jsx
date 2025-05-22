@@ -1,85 +1,39 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import PropTypes from "prop-types";
-
-const EditableCategory = ({ name, index, onNameChange }) => {
-  const [editing, setEditing] = useState(false);
-  const [tempName, setTempName] = useState(name);
-
-  const handleBlur = () => {
-    setEditing(false);
-    onNameChange(index, tempName);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      setEditing(false);
-      onNameChange(index, tempName);
-    }
-  };
-
-  return editing ? (
-    <input
-      type="text"
-      value={tempName}
-      autoFocus
-      onChange={(e) => setTempName(e.target.value)}
-      onBlur={handleBlur}
-      onKeyDown={handleKeyDown}
-      className="category-input"
-    />
-  ) : (
-    <div
-      onClick={() => setEditing(true)}
-      className="category-box"
-      style={{ cursor: "pointer" }}
-    >
-      {name || <em>Click to name me</em>}
-    </div>
-  );
-};
 
 function MyApp() {
   const [tasks, setTasks] = useState([]);
-  const navigate = useNavigate();
-  const [quote, setQuote] = useState("Loading quote...");
-  const [progress, setProgress] = useState(0);
-  const [message, setMessage] = useState("");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
-  const [activePage, setActivePage] = useState("home");
   const [checkedTasks, setCheckedTasks] = useState([]);
-
+  const [progress, setProgress] = useState(0);
+  const [quote, setQuote] = useState("Loading...");
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activePage, setActivePage] = useState("home");
+  const navigate = useNavigate();
   const sidebarRef = useRef();
 
-  const [categories, setCategories] = useState([
-    { name: "" },
-    { name: "" },
-    { name: "" },
-    { name: "" },
-    { name: "" },
-    { name: "" },
-  ]);
+  const categories = [
+    { name: "School" },
+    { name: "Work" },
+    { name: "Errands" },
+    { name: "Health" },
+    { name: "Fitness" },
+    { name: "Chores" },
+  ];
 
-  // function removeTask(id) {
-  //   fetch(`http://localhost:8000/tasks/${id}`, {
-  //     method: "DELETE",
-  //   })
-  //     .then((res) => {
-  //       if (res.status === 204) {
-  //         setTasks(tasks.filter((task) => task._id !== id));
-  //       } else {
-  //         console.error("Delete failed");
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       console.error("Delete failed:", error);
-  //     });
-  // }
-  const butterTasks = tasks.filter((task) => Number(task.expectedTime) < 60);
-  const normalTasks = tasks.filter((task) => Number(task.expectedTime) >= 60);
+  // Separate tasks by ease (expectedTime equivalent)
+  const butterTasks = tasks.filter((task) => Number(task.ease) < 60);
+  const normalTasks = tasks.filter((task) => Number(task.ease) >= 60);
 
+  // Group normal tasks by category
+  const tasksByCategory = {};
+  categories.forEach((cat) => {
+    tasksByCategory[cat.name] = normalTasks.filter(
+      (task) => task.category === cat.name
+    );
+  });
+
+  // Close sidebar when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
@@ -96,25 +50,36 @@ function MyApp() {
     };
   }, [sidebarOpen]);
 
-  useEffect(() => {
+  // Fetch tasks from backend
+  const fetchTasks = () => {
     fetch("http://localhost:8000/tasks")
       .then((res) => res.json())
-      .then((json) => setTasks(json["task_list"]))
-      .catch((error) => console.log(error));
+      .then((json) => {
+        console.log("Fetched tasks:", json.task_list);
+        setTasks(json.task_list || []);
+      })
+      .catch((error) => {
+        console.error("Error fetching tasks:", error);
+        setTasks([]);
+      });
+  };
+
+  useEffect(() => {
+    fetchTasks();
   }, []);
+
+  useEffect(() => {
+    const total = tasks.length;
+    const completed = checkedTasks.length;
+    const percent = total === 0 ? 100 : Math.round((completed / total) * 100);
+    setProgress(percent);
+  }, [checkedTasks, tasks]);
 
   useEffect(() => {
     const fallbackQuotes = [
       "Stay focused and keep toasting.",
       "Small crumbs lead to big loaves.",
       "No task is too crusty to conquer.",
-      "You rise by lifting tasks.",
-      "The butter always spreads after effort.",
-      "Productivity is the yeast of success.",
-      "Crumb by crumb, progress is made.",
-      "Toasty minds finish tasks.",
-      "Break your big goals into little slices.",
-      "All good things start with one crumb.",
     ];
     const fallback =
       fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
@@ -126,61 +91,46 @@ function MyApp() {
         setQuote(
           random?.text
             ? `${random.text} – Mr. Crumb`
-            : `${fallback} – Mr. Crumb`,
+            : `${fallback} – Mr. Crumb`
         );
       })
       .catch(() => setQuote(`${fallback} – Mr. Crumb`));
   }, []);
 
-  useEffect(() => {
-    const total = butterTasks.length + normalTasks.length;
-    const completed = checkedTasks.length;
-    const percent = total === 0 ? 100 : Math.round((completed / total) * 100);
-
-    setProgress(percent);
-
-    if (percent === 100) {
-      setMessage("🥳 100% Completed!");
-    } else if (percent >= 50) {
-      setMessage("🎉 Great job! You're halfway through!");
-    } else {
-      setMessage("");
-    }
-  }, [checkedTasks, butterTasks, normalTasks]);
-
-  // function addTask(task) {
-  //   setTasks((prevTasks) => [...prevTasks, task]);
-  //   setTasks((prev) => [...prev, task]);
-  // }
-
-  function toggleChecked(taskId) {
+  const toggleChecked = (taskId) => {
     setCheckedTasks((prev) =>
       prev.includes(taskId)
         ? prev.filter((id) => id !== taskId)
-        : [...prev, taskId],
+        : [...prev, taskId]
     );
-  }
+  };
 
-  function completeCheckedTasks() {
-    const updatedTasks = tasks.filter((task, index) => {
-      const taskId = task._id || `${task.title}-${index}`;
-      return !checkedTasks.includes(taskId);
+  const completeCheckedTasks = () => {
+    const updatedTasks = tasks.filter((task) => {
+      return !checkedTasks.includes(task._id);
     });
 
     setTasks(updatedTasks);
     setCheckedTasks([]);
 
+    // Delete from backend
     checkedTasks.forEach((id) => {
-      if (!id.includes("-")) {
-        fetch(`http://localhost:8000/tasks/${id}`, {
-          method: "DELETE",
-        }).catch((err) => console.error("Delete failed", err));
-      }
+      fetch(`http://localhost:8000/tasks/${id}`, {
+        method: "DELETE",
+      }).catch((err) => console.error("Delete failed", err));
     });
-  }
+  };
+
+  const openCategoryModal = (categoryName) => {
+    setSelectedCategory(categoryName);
+  };
+
+  const closeCategoryModal = () => {
+    setSelectedCategory(null);
+  };
 
   return (
-    <div className={`pink-background ${darkMode ? "dark-mode" : ""}`}>
+    <div className="pink-background">
       {/* Hamburger Menu */}
       <div
         className="hamburger-menu"
@@ -198,21 +148,43 @@ function MyApp() {
           <li>
             <button
               className="sidebar-link"
-              onClick={() => setActivePage("home")}
+              onClick={() => {
+                setActivePage("home");
+                setSidebarOpen(false);
+              }}
             >
               🏠 Home
             </button>
           </li>
           <li>
-            <button className="sidebar-link">📆 Calendar View</button>
+            <button 
+              className="sidebar-link"
+              onClick={() => {
+                setActivePage("calendar");
+                setSidebarOpen(false);
+              }}
+            >
+              📆 Calendar View
+            </button>
           </li>
           <li>
-            <button className="sidebar-link">👤 Profile</button>
+            <button 
+              className="sidebar-link"
+              onClick={() => {
+                setActivePage("profile");
+                setSidebarOpen(false);
+              }}
+            >
+              👤 Profile
+            </button>
           </li>
           <li>
             <button
               className="sidebar-link"
-              onClick={() => setActivePage("settings")}
+              onClick={() => {
+                setActivePage("settings");
+                setSidebarOpen(false);
+              }}
             >
               ⚙️ Settings
             </button>
@@ -224,17 +196,10 @@ function MyApp() {
       {activePage === "settings" && (
         <div className="settings-page">
           <h2>⚙️ Settings</h2>
-          <label>
-            <input
-              type="checkbox"
-              checked={darkMode}
-              onChange={() => setDarkMode(!darkMode)}
-            />
-            Enable Dark Mode
-          </label>
           <div className="settings-placeholder">
-            <p>🛠 More settings coming soon:</p>
+            <p>🛠 Settings coming soon:</p>
             <ul>
+              <li>Dark mode</li>
               <li>Font size</li>
               <li>Task sorting preferences</li>
               <li>Show/hide motivational quotes</li>
@@ -243,143 +208,155 @@ function MyApp() {
         </div>
       )}
 
+      {/* Calendar Page */}
+      {activePage === "calendar" && (
+        <div className="calendar-page">
+          <h2>📆 Calendar View</h2>
+          <div className="calendar-placeholder">
+            <p>📅 Calendar view coming soon!</p>
+            <p>Here you'll be able to see your tasks organized by due date.</p>
+          </div>
+        </div>
+      )}
+
+      {/* Profile Page */}
+      {activePage === "profile" && (
+        <div className="profile-page">
+          <h2>👤 Profile</h2>
+          <div className="profile-placeholder">
+            <p>👋 Welcome to your profile!</p>
+            <p>Profile customization coming soon:</p>
+            <ul>
+              <li>Task completion statistics</li>
+              <li>Productivity insights</li>
+              <li>Achievement badges</li>
+            </ul>
+          </div>
+        </div>
+      )}
+
       {/* Home Page */}
       {activePage === "home" && (
         <>
-          <div className="title-box">
-            <h1>CrumbList 🥖</h1>
-          </div>
+      <div className="title-box">
+        <h1>CrumbList 🥖</h1>
+      </div>
 
-          {/* Category Grid */}
-          <div className="category-grid">
-            {categories.map((cat, index) => (
-              <EditableCategory
-                key={index}
-                name={cat.name}
-                index={index}
-                onNameChange={(i, newName) => {
-                  const updated = [...categories];
-                  updated[i].name = newName;
-                  setCategories(updated);
-                }}
-              />
-            ))}
+      {/* Category Grid */}
+      <div className="category-grid">
+        {categories.map((cat, index) => (
+          <div
+            key={index}
+            className="category-box"
+            onClick={() => openCategoryModal(cat.name)}
+            style={{ cursor: "pointer" }}
+          >
+            <h3>{cat.name}</h3>
+            <p className="task-count">({tasksByCategory[cat.name].length} tasks)</p>
           </div>
+        ))}
+      </div>
 
-          {/* Butter Tasks */}
-          <div className="butter-row">
-            <div className="butter-tasks">
-              <div className="butter-title">🧈 Butter Tasks</div>
-              {butterTasks.length === 0 ? (
-                <p className="no-butter">No tasks under 60 minutes yet.</p>
+      {/* Category Modal */}
+      {selectedCategory && (
+        <div className="modal-overlay" onClick={closeCategoryModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{selectedCategory} Tasks</h2>
+              <button className="close-button" onClick={closeCategoryModal}>
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              {tasksByCategory[selectedCategory].length === 0 ? (
+                <p>No tasks in this category yet.</p>
               ) : (
-                <div className="butter-task-grid">
-                  {butterTasks.map((task, index) => {
-                    const taskId = task._id || `${task.title}-${index}`;
-                    return (
-                      <div key={taskId} className="butter-task-grid-row">
-                        <span>{task.title}</span>
+                <ul className="modal-task-list">
+                  {tasksByCategory[selectedCategory].map((task) => (
+                    <li key={task._id}>
+                      <label>
                         <input
                           type="checkbox"
-                          checked={checkedTasks.includes(taskId)}
-                          onChange={() => toggleChecked(taskId)}
+                          checked={checkedTasks.includes(task._id)}
+                          onChange={() => toggleChecked(task._id)}
                         />
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-              {checkedTasks.length > 0 && (
-                <button
-                  className="complete-button"
-                  onClick={completeCheckedTasks}
-                >
-                  ✅ Complete Selected
-                </button>
+                        <strong>{task.name}</strong> - {task.ease} minutes
+                        {task.description && <p>{task.description}</p>}
+                      </label>
+                    </li>
+                  ))}
+                </ul>
               )}
             </div>
-            <div className="button-col">
-              <button
-                className="add-task-button"
-                onClick={() => navigate("/add-task")}
-              >
-                Add Task
-              </button>
-              <button className="calendar-button">Calendar View</button>
-            </div>
-
-            {/* <button className="calendar-button">Calendar View</button> */}
           </div>
+        </div>
+      )}
 
-          {/* <div className="task-preview">
-        <h2>Task Preview</h2>
-        <ul>
-          {tasks.map((task, idx) => (
-            <li key={idx}>
-              <strong>{task.title}</strong> | {task.category} | {task.dueDate} | {task.expectedTime} mins  
-              <br />
-              Notes: {task.notes}
-            </li>
-          ))}
-        </ul>
-      </div> */}
-          {/* Normal Tasks */}
-          {normalTasks.length > 0 && (
-            <div className="normal-tasks">
-              <h2>📝 Normal Tasks</h2>
-              <ul className="normal-task-list">
-                {normalTasks.map((task) => (
-                  <li key={task._id}>
-                    <strong>{task.title}</strong> — {task.expectedTime} min
-                  </li>
-                ))}
-              </ul>
+      {/* Butter Tasks */}
+      <div className="butter-row">
+        <div className="butter-tasks">
+          <div className="butter-title">🧈 Butter Tasks <span className="task-count">({butterTasks.length})</span></div>
+          {butterTasks.length === 0 ? (
+            <p className="no-butter">No quick tasks under 60 minutes yet.</p>
+          ) : (
+            <div className="butter-task-grid">
+              {butterTasks.map((task) => (
+                <div key={task._id} className="butter-task-grid-row">
+                  <span>{task.name} ({task.ease} min)</span>
+                  <input
+                    type="checkbox"
+                    checked={checkedTasks.includes(task._id)}
+                    onChange={() => toggleChecked(task._id)}
+                  />
+                </div>
+              ))}
             </div>
           )}
+          {checkedTasks.length > 0 && (
+            <button className="complete-button" onClick={completeCheckedTasks}>
+              ✅ Complete Selected ({checkedTasks.length})
+            </button>
+          )}
+        </div>
+        <div className="button-col">
+          <button
+            className="add-task-button"
+            onClick={() => navigate("/add-task")}
+          >
+            Add Task
+          </button>
+        </div>
+      </div>
 
-          {/* Task Input */}
-          {/* <TaskInputForm categories={categories} onSubmit={addTask} /> */}
+      {/* Quote */}
+      <div className="quote-box">
+        <blockquote>{quote}</blockquote>
+      </div>
 
-          {/* ✅ Quote Box */}
-          <div className="quote-box">
-            <blockquote>{quote}</blockquote>
-          </div>
-
-          {/* Toast Progress Bar */}
-          <div className="toast-section">
-            <h2>Toast Your Tasks…</h2>
-            <div className="toast-bar-wrapper">
-              <div
-                className="emoji-fire"
-                style={{ left: `calc(${progress}% - 12px)` }}
-              >
-                🔥
-              </div>
-              <div className="toast-bar">
-                <div
-                  className="toast-fill"
-                  style={{ width: `${progress}%` }}
-                ></div>
-                <div className="toast-text">
-                  {progress === 100
-                    ? "100% Completed!"
-                    : `Task Progress (${progress}%)`}
-                </div>
-              </div>
-              <span className="emoji-bread">🍞</span>
+      {/* Toast Progress Bar */}
+      <div className="toast-section">
+        <h2>Toast Your Tasks…</h2>
+        <div className="toast-bar-wrapper">
+          <div className="emoji-fire">🔥</div>
+          <div className="toast-bar">
+            <div
+              className="toast-fill"
+              style={{ width: `${progress}%` }}
+            ></div>
+            <div className="toast-text">
+              {progress === 100
+                ? "100% Completed!"
+                : `Task Progress (${progress}%)`}
             </div>
-            <p className="toast-message">{message}</p>
           </div>
+          <span className="emoji-bread">🍞</span>
+        </div>
+      </div>
+
         </>
       )}
     </div>
   );
 }
-
-EditableCategory.propTypes = {
-  name: PropTypes.string.isRequired,
-  index: PropTypes.number.isRequired,
-  onNameChange: PropTypes.func.isRequired,
-};
 
 export default MyApp;
