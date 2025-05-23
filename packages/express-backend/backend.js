@@ -1,12 +1,69 @@
 import express from "express";
 import cors from "cors";
 import taskFunction from "./task-functions.js";
+import User from "./models/user.js";
+
 
 const app = express();
 const port = 8000;
 
 app.use(cors());
 app.use(express.json());
+
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: "Username and password required." });
+  }
+
+  try {
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return res.status(401).json({ error: "User not found." });
+    }
+
+    if (user.password !== password) {
+      return res.status(401).json({ error: "Incorrect password." });
+    }
+
+    // Success!
+    return res.status(200).json({ message: "Login successful.", user: username });
+
+  } catch (err) {
+    console.error("Login error:", err);
+    return res.status(500).json({ error: "Server error during login." });
+  }
+});
+
+
+
+app.post("/signup", async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: "Username and password are required." });
+  }
+
+  try {
+    // Check if username already exists
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(409).json({ error: "Username already taken." });
+    }
+
+    // Create and save new user
+    const newUser = new User({ username, password });
+    await newUser.save();
+
+    return res.status(201).json({ message: "User created successfully." });
+  } catch (err) {
+    console.error("Signup error:", err);
+    return res.status(500).json({ error: "Server error during signup." });
+  }
+});
+
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

@@ -1,25 +1,8 @@
 import mongoose from "mongoose";
 
-const UserSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    job: {
-      type: String,
-      required: true,
-      trim: true,
-      validate(value) {
-        if (value.length < 2)
-          throw new Error("Invalid job, must be at least 2 characters.");
-      },
-    },
-  },
-  { collection: "users_list" },
-);
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true } // plain for now — later: hash it
+});
 
-const User = mongoose.model("User", UserSchema);
-
-export default User;
+export default mongoose.model("User", userSchema);
