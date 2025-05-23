@@ -19,6 +19,15 @@ const EditableCategory = ({ name, index, onNameChange, taskCount, onClick }) => 
     }
   };
 
+  const handleCategoryClick = () => {
+    setEditing(true);
+  };
+
+  const handleViewTasksClick = (e) => {
+    e.stopPropagation();
+    onClick();
+  };
+
   return editing ? (
     <input
       type="text"
@@ -41,6 +50,16 @@ const EditableCategory = ({ name, index, onNameChange, taskCount, onClick }) => 
   );
 };
 
+    <div className="category-box" style={{ cursor: "pointer" }}>
+      <h3 onClick={handleCategoryClick} style={{ cursor: "text" }}>
+        {name}
+      </h3>
+      <p className="task-count" onClick={handleViewTasksClick} style={{ cursor: "pointer" }}>
+        ({taskCount} tasks)
+      </p>
+    </div>
+  );
+};
 
 function MyApp() {
   const [tasks, setTasks] = useState([]);
@@ -61,6 +80,21 @@ function MyApp() {
     { name: "" },
     { name: "" }
   ]);
+  // Initialize categories from localStorage or use defaults
+  const [categories, setCategories] = useState(() => {
+    const savedCategories = localStorage.getItem('crumblist-categories');
+    if (savedCategories) {
+      return JSON.parse(savedCategories);
+    }
+    return [
+      { name: "School" },
+      { name: "Work" },
+      { name: "Errands" },
+      { name: "Health" },
+      { name: "Fitness" },
+      { name: "Chores" }
+    ];
+  });
 
   // Separate tasks by ease (expectedTime equivalent)
   const butterTasks = tasks.filter((task) => Number(task.ease) < 60);
@@ -108,6 +142,11 @@ function MyApp() {
   useEffect(() => {
     fetchTasks();
   }, []);
+
+  // Save categories to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('crumblist-categories', JSON.stringify(categories));
+  }, [categories]);
 
   useEffect(() => {
     const total = tasks.length;
@@ -160,6 +199,12 @@ function MyApp() {
         method: "DELETE",
       }).catch((err) => console.error("Delete failed", err));
     });
+  };
+
+  const updateCategoryName = (index, newName) => {
+    const updated = [...categories];
+    updated[index].name = newName;
+    setCategories(updated);
   };
 
   const openCategoryModal = (categoryName) => {
@@ -279,9 +324,9 @@ function MyApp() {
       {/* Home Page */}
       {activePage === "home" && (
         <>
-      <div className="title-box">
-        <h1>CrumbList 🥖</h1>
-      </div>
+          <div className="title-box">
+            <h1>CrumbList 🥖</h1>
+          </div>
 
       {/* Category Grid */}
       <div className="category-grid">
@@ -301,103 +346,115 @@ function MyApp() {
       ))}
 
       </div>
+          {/* Category Grid */}
+          <div className="category-grid">
+            {categories.map((cat, index) => (
+              <EditableCategory
+                key={index}
+                name={cat.name}
+                index={index}
+                onNameChange={updateCategoryName}
+                taskCount={tasksByCategory[cat.name]?.length || 0}
+                onClick={() => openCategoryModal(cat.name)}
+              />
+            ))}
+          </div>
 
-      {/* Category Modal */}
-      {selectedCategory && (
-        <div className="modal-overlay" onClick={closeCategoryModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>{selectedCategory} Tasks</h2>
-              <button className="close-button" onClick={closeCategoryModal}>
-                ×
-              </button>
+          {/* Category Modal */}
+          {selectedCategory && (
+            <div className="modal-overlay" onClick={closeCategoryModal}>
+              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                  <h2>{selectedCategory} Tasks</h2>
+                  <button className="close-button" onClick={closeCategoryModal}>
+                    ×
+                  </button>
+                </div>
+                <div className="modal-body">
+                  {tasksByCategory[selectedCategory].length === 0 ? (
+                    <p>No tasks in this category yet.</p>
+                  ) : (
+                    <ul className="modal-task-list">
+                      {tasksByCategory[selectedCategory].map((task) => (
+                        <li key={task._id}>
+                          <label>
+                            <input
+                              type="checkbox"
+                              checked={checkedTasks.includes(task._id)}
+                              onChange={() => toggleChecked(task._id)}
+                            />
+                            <strong>{task.name}</strong> - {task.ease} minutes
+                            {task.description && <p>{task.description}</p>}
+                          </label>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
             </div>
-            <div className="modal-body">
-              {tasksByCategory[selectedCategory].length === 0 ? (
-                <p>No tasks in this category yet.</p>
+          )}
+
+          {/* Butter Tasks */}
+          <div className="butter-row">
+            <div className="butter-tasks">
+              <div className="butter-title">🧈 Butter Tasks <span className="task-count">({butterTasks.length})</span></div>
+              {butterTasks.length === 0 ? (
+                <p className="no-butter">No quick tasks under 60 minutes yet.</p>
               ) : (
-                <ul className="modal-task-list">
-                  {tasksByCategory[selectedCategory].map((task) => (
-                    <li key={task._id}>
-                      <label>
-                        <input
-                          type="checkbox"
-                          checked={checkedTasks.includes(task._id)}
-                          onChange={() => toggleChecked(task._id)}
-                        />
-                        <strong>{task.name}</strong> - {task.ease} minutes
-                        {task.description && <p>{task.description}</p>}
-                      </label>
-                    </li>
+                <div className="butter-task-grid">
+                  {butterTasks.map((task) => (
+                    <div key={task._id} className="butter-task-grid-row">
+                      <span>{task.name} ({task.ease} min)</span>
+                      <input
+                        type="checkbox"
+                        checked={checkedTasks.includes(task._id)}
+                        onChange={() => toggleChecked(task._id)}
+                      />
+                    </div>
                   ))}
-                </ul>
+                </div>
+              )}
+              {checkedTasks.length > 0 && (
+                <button className="complete-button" onClick={completeCheckedTasks}>
+                  ✅ Complete Selected ({checkedTasks.length})
+                </button>
               )}
             </div>
+            <div className="button-col">
+              <button
+                className="add-task-button"
+                onClick={() => navigate("/add-task")}
+              >
+                Add Task
+              </button>
+            </div>
           </div>
-        </div>
-      )}
 
-      {/* Butter Tasks */}
-      <div className="butter-row">
-        <div className="butter-tasks">
-          <div className="butter-title">🧈 Butter Tasks <span className="task-count">({butterTasks.length})</span></div>
-          {butterTasks.length === 0 ? (
-            <p className="no-butter">No quick tasks under 60 minutes yet.</p>
-          ) : (
-            <div className="butter-task-grid">
-              {butterTasks.map((task) => (
-                <div key={task._id} className="butter-task-grid-row">
-                  <span>{task.name} ({task.ease} min)</span>
-                  <input
-                    type="checkbox"
-                    checked={checkedTasks.includes(task._id)}
-                    onChange={() => toggleChecked(task._id)}
-                  />
+          {/* Quote */}
+          <div className="quote-box">
+            <blockquote>{quote}</blockquote>
+          </div>
+
+          {/* Toast Progress Bar */}
+          <div className="toast-section">
+            <h2>Toast Your Tasks…</h2>
+            <div className="toast-bar-wrapper">
+              <div className="emoji-fire">🔥</div>
+              <div className="toast-bar">
+                <div
+                  className="toast-fill"
+                  style={{ width: `${progress}%` }}
+                ></div>
+                <div className="toast-text">
+                  {progress === 100
+                    ? "100% Completed!"
+                    : `Task Progress (${progress}%)`}
                 </div>
-              ))}
-            </div>
-          )}
-          {checkedTasks.length > 0 && (
-            <button className="complete-button" onClick={completeCheckedTasks}>
-              ✅ Complete Selected ({checkedTasks.length})
-            </button>
-          )}
-        </div>
-        <div className="button-col">
-          <button
-            className="add-task-button"
-            onClick={() => navigate("/add-task")}
-          >
-            Add Task
-          </button>
-        </div>
-      </div>
-
-      {/* Quote */}
-      <div className="quote-box">
-        <blockquote>{quote}</blockquote>
-      </div>
-
-      {/* Toast Progress Bar */}
-      <div className="toast-section">
-        <h2>Toast Your Tasks…</h2>
-        <div className="toast-bar-wrapper">
-          <div className="emoji-fire">🔥</div>
-          <div className="toast-bar">
-            <div
-              className="toast-fill"
-              style={{ width: `${progress}%` }}
-            ></div>
-            <div className="toast-text">
-              {progress === 100
-                ? "100% Completed!"
-                : `Task Progress (${progress}%)`}
+              </div>
+              <span className="emoji-bread">🍞</span>
             </div>
           </div>
-          <span className="emoji-bread">🍞</span>
-        </div>
-      </div>
-
         </>
       )}   
     </div>
