@@ -48,18 +48,11 @@ const EditableCategory = ({ name, index, onNameChange, taskCount, onClick }) => 
       {name && <p className="task-count">({taskCount} tasks)</p>}
     </div>
   );
+
+  
 };
 
-    <div className="category-box" style={{ cursor: "pointer" }}>
-      <h3 onClick={handleCategoryClick} style={{ cursor: "text" }}>
-        {name}
-      </h3>
-      <p className="task-count" onClick={handleViewTasksClick} style={{ cursor: "pointer" }}>
-        ({taskCount} tasks)
-      </p>
-    </div>
-  );
-};
+
 
 function MyApp() {
   const [tasks, setTasks] = useState([]);
@@ -72,14 +65,7 @@ function MyApp() {
   const navigate = useNavigate();
   const sidebarRef = useRef();
 
-  const [categories, setCategories] = useState([
-    { name: "" },
-    { name: "" },
-    { name: "" },
-    { name: "" },
-    { name: "" },
-    { name: "" }
-  ]);
+
   // Initialize categories from localStorage or use defaults
   const [categories, setCategories] = useState(() => {
     const savedCategories = localStorage.getItem('crumblist-categories');
@@ -328,24 +314,6 @@ function MyApp() {
             <h1>CrumbList 🥖</h1>
           </div>
 
-      {/* Category Grid */}
-      <div className="category-grid">
-      {categories.map((cat, index) => (
-        <EditableCategory
-          key={index}
-          name={cat.name}
-          index={index}
-          onNameChange={(i, newName) => {
-            const updated = [...categories];
-            updated[i].name = newName;
-            setCategories(updated);
-          }}
-          taskCount={tasksByCategory[cat.name]?.length || 0}
-          onClick={() => openCategoryModal(cat.name)}
-        />
-      ))}
-
-      </div>
           {/* Category Grid */}
           <div className="category-grid">
             {categories.map((cat, index) => (
