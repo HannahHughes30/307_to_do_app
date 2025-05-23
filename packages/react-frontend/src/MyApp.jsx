@@ -412,4 +412,5 @@ EditableCategory.propTypes = {
   onClick: PropTypes.func,
 };
 
+
 export default MyApp;
