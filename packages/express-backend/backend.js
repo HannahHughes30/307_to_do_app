@@ -1,14 +1,38 @@
 import express from "express";
 import cors from "cors";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
 import taskFunction from "./task-functions.js";
 import User from "./models/user.js";
 
+// Load environment variables
+dotenv.config();
 
 const app = express();
-const port = 8000;
+const port = process.env.PORT || 8000;
+
+// Database connection - using MONGO_URI from your .env file
+const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI || "mongodb://localhost:27017/crumblist";
+
+console.log("Attempting to connect to MongoDB...");
+mongoose.connect(mongoUri)
+  .then(() => {
+    console.log("Connected to MongoDB successfully");
+  })
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+  });
 
 app.use(cors());
 app.use(express.json());
+
+// Test route
+app.get("/", (req, res) => {
+  res.json({ 
+    message: "Crumblist API is running!",
+    database: mongoose.connection.readyState === 1 ? "Connected" : "Disconnected"
+  });
+});
 
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
@@ -37,8 +61,6 @@ app.post("/login", async (req, res) => {
   }
 });
 
-
-
 app.post("/signup", async (req, res) => {
   const { username, password } = req.body;
 
@@ -62,11 +84,6 @@ app.post("/signup", async (req, res) => {
     console.error("Signup error:", err);
     return res.status(500).json({ error: "Server error during signup." });
   }
-});
-
-
-app.get("/", (req, res) => {
-  res.send("Hello World!");
 });
 
 app.get("/tasks/:id", (req, res) => {
@@ -95,7 +112,7 @@ app.get("/tasks", (req, res) => {
 
 app.post("/tasks", (req, res) => {
   console.log("Received task data:", req.body);
-  
+
   // Validate required fields
   if (!req.body.name || !req.body.category) {
     return res.status(400).json({ error: "Name and category are required" });
@@ -127,5 +144,6 @@ app.delete("/tasks/:id", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+  console.log(`Crumblist API server running on port ${port}`);
+  console.log(`Database connection: ${mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected'}`);
 });
