@@ -385,7 +385,7 @@ function MyApp() {
               )}
               {checkedTasks.length > 0 && (
                 <button className="complete-button" onClick={completeCheckedTasks}>
-                  ✅ Complete Selected ({checkedTasks.length})
+                  Remove Selected ({checkedTasks.length})
                 </button>
               )}
             </div>
