@@ -39,20 +39,31 @@ const EditableCategory = ({ name, index, onNameChange, taskCount, onClick }) => 
       className="category-input"
     />
   ) : (
-    <div
-      onClick={() => name ? onClick() : setEditing(true)}
-      className="category-box"
-      style={{ cursor: "pointer" }}
-    >
-      <h3>{name || <em>Click to name me</em>}</h3>
-      {name && <p className="task-count">({taskCount} tasks)</p>}
+    <div className="category-box" style={{ cursor: "pointer" }}>
+      <h3 
+        onClick={(e) => {
+          e.stopPropagation();
+          setEditing(true);
+        }}
+        style={{ cursor: "text" }}
+      >
+        {name || <em>Click to name me</em>}
+      </h3>
+      {name && (
+        <p 
+          className="task-count"
+          onClick={(e) => {
+            e.stopPropagation();
+            onClick();
+          }}
+          style={{ cursor: "pointer" }}
+        >
+          ({taskCount} tasks)
+        </p>
+      )}
     </div>
   );
-
-  
 };
-
-
 
 function MyApp() {
   const [tasks, setTasks] = useState([]);
@@ -64,7 +75,6 @@ function MyApp() {
   const [activePage, setActivePage] = useState("home");
   const navigate = useNavigate();
   const sidebarRef = useRef();
-
 
   // Initialize categories from localStorage or use defaults
   const [categories, setCategories] = useState(() => {
@@ -338,11 +348,11 @@ function MyApp() {
                   </button>
                 </div>
                 <div className="modal-body">
-                  {tasksByCategory[selectedCategory].length === 0 ? (
+                  {tasksByCategory[selectedCategory]?.length === 0 ? (
                     <p>No tasks in this category yet.</p>
                   ) : (
                     <ul className="modal-task-list">
-                      {tasksByCategory[selectedCategory].map((task) => (
+                      {tasksByCategory[selectedCategory]?.map((task) => (
                         <li key={task._id}>
                           <label>
                             <input
@@ -435,6 +445,5 @@ EditableCategory.propTypes = {
   taskCount: PropTypes.number,
   onClick: PropTypes.func,
 };
-
 
 export default MyApp;
