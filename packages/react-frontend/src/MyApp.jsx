@@ -296,7 +296,7 @@ function MyApp() {
         <div className="profile-page">
           <h2>👤 Profile</h2>
           <div className="profile-placeholder">
-            <p>👋 Welcome to your profile!</p>
+            <p> Welcome to your profile!</p>
             <p>Profile customization coming soon:</p>
             <ul>
               <li>Task completion statistics</li>
