@@ -6,8 +6,8 @@
     "test": "echo \"No tests yet\"",
     "format": "prettier --write .",
     "lint": "npx eslint . && npx prettier --check .",
-    "dev": "nodemon backend_with_db.js",
-    "start": "node backend_with_db.js"
+    "dev": "echo \"This is a monorepo - run workspaces individually\"",
+    "start": "echo \"This is a monorepo - run workspaces individually\""
   },
   "author": "",
   "license": "ISC",
