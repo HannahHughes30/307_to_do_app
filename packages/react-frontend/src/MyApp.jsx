@@ -82,7 +82,6 @@ function MyApp() {
     ];
   });
 
-  // Separate tasks by ease (expectedTime equivalent)
   const butterTasks = tasks.filter((task) => Number(task.ease) < 60);
   const normalTasks = tasks.filter((task) => Number(task.ease) >= 60);
 
