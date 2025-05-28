@@ -112,7 +112,7 @@ function MyApp() {
 
   // Fetch tasks from backend
   const fetchTasks = () => {
-    fetch("http://localhost:8000/tasks")
+    fetch("https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/tasks")
       .then((res) => res.json())
       .then((json) => {
         console.log("Fetched tasks:", json.task_list);
@@ -180,7 +180,7 @@ function MyApp() {
 
     // Delete from backend
     checkedTasks.forEach((id) => {
-      fetch(`http://localhost:8000/tasks/${id}`, {
+      fetch(`https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/tasks/${id}`, {
         method: "DELETE",
       }).catch((err) => console.error("Delete failed", err));
     });

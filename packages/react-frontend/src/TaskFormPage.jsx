@@ -51,7 +51,7 @@ function TaskFormPage() {
   const handleFormSubmit = (task) => {
     console.log("Submitting to backend:", task);
     
-    fetch("http://localhost:8000/tasks", {
+    fetch("https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/tasks", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
