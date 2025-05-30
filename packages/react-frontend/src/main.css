@@ -1528,9 +1528,10 @@ caption {
 }
 
 .modal-content {
-  background: white;
+  background: #fff;
   border-radius: 10px;
-  padding: 20px;
+  /* padding: 20px; */
+  padding: 2rem;
   max-width: 500px;
   width: 90%;
   max-height: 70vh;

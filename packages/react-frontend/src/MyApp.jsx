@@ -1,66 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
+import CategoryPage from "./CategoryPage";
 
-const EditableCategory = ({ name, index, onNameChange, taskCount, onClick }) => {
-  const [editing, setEditing] = useState(false);
-  const [tempName, setTempName] = useState(name);
-
-  const handleBlur = () => {
-    setEditing(false);
-    onNameChange(index, tempName);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      setEditing(false);
-      onNameChange(index, tempName);
-    }
-  };
-
-  const handleCategoryClick = () => {
-    setEditing(true);
-  };
-
-  const handleViewTasksClick = (e) => {
-    e.stopPropagation();
-    onClick();
-  };
-
-  return editing ? (
-    <input
-      type="text"
-      value={tempName}
-      autoFocus
-      onChange={(e) => setTempName(e.target.value)}
-      onBlur={handleBlur}
-      onKeyDown={handleKeyDown}
-      className="category-input"
-    />
-  ) : (
-    <div className="category-box" style={{ cursor: "pointer" }}>
-      <h3 
-        onClick={(e) => {
-          e.stopPropagation();
-          setEditing(true);
-        }}
-        style={{ cursor: "text" }}
-      >
-        {name || <em>Click to name me</em>}
-      </h3>
-      {name && (
-        <p 
-          className="task-count"
-          onClick={(e) => {
-            e.stopPropagation();
-            onClick();
-          }}
-          style={{ cursor: "pointer" }}
-        >
-          ({taskCount} tasks)
-        </p>
-      )}
+const EditableCategory = ({ name, taskCount, onClick }) => {
+  return (
+    <div className="category-box" style={{ cursor: "pointer" }} onClick={onClick}>
+      <h3>{name}</h3>
+      <p className="task-count">({taskCount} tasks)</p>
     </div>
   );
 };
@@ -70,77 +17,61 @@ function MyApp() {
   const [checkedTasks, setCheckedTasks] = useState([]);
   const [progress, setProgress] = useState(0);
   const [quote, setQuote] = useState("Loading...");
-  const [selectedCategory, setSelectedCategory] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activePage, setActivePage] = useState("home");
+  const location = useLocation();
   const navigate = useNavigate();
   const sidebarRef = useRef();
 
-  // Initialize categories from localStorage or use defaults
   const [categories, setCategories] = useState(() => {
-    const savedCategories = localStorage.getItem('crumblist-categories');
-    if (savedCategories) {
-      return JSON.parse(savedCategories);
-    }
-    return [
-      { name: "School" },
-      { name: "Work" },
-      { name: "Errands" },
-      { name: "Health" },
-      { name: "Fitness" },
-      { name: "Chores" }
-    ];
+    const saved = localStorage.getItem("crumblist-categories");
+    return saved
+      ? JSON.parse(saved)
+      : [
+          { name: "School" },
+          { name: "Work" },
+          { name: "Errands" },
+          { name: "Health" },
+          { name: "Fitness" },
+          { name: "Chores" }
+        ];
   });
 
   const butterTasks = tasks.filter((task) => Number(task.ease) < 60);
   const normalTasks = tasks.filter((task) => Number(task.ease) >= 60);
 
-  // Group normal tasks by category
   const tasksByCategory = {};
   categories.forEach((cat) => {
     tasksByCategory[cat.name] = normalTasks.filter(
-      (task) => task.category === cat.name
+      (task) => task.category?.toLowerCase() === cat.name.toLowerCase()
     );
   });
 
-  // Close sidebar when clicking outside
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+    function handleClickOutside(e) {
+      if (sidebarRef.current && !sidebarRef.current.contains(e.target)) {
         setSidebarOpen(false);
       }
     }
-
     if (sidebarOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [sidebarOpen]);
 
-  // Fetch tasks from backend
-  const fetchTasks = () => {
+  useEffect(() => {
     fetch("https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/tasks")
       .then((res) => res.json())
-      .then((json) => {
-        console.log("Fetched tasks:", json.task_list);
-        setTasks(json.task_list || []);
-      })
-      .catch((error) => {
-        console.error("Error fetching tasks:", error);
+      .then((json) => setTasks(json.task_list || []))
+      .catch((err) => {
+        console.error("Error fetching tasks:", err);
         setTasks([]);
       });
-  };
-
-  useEffect(() => {
-    fetchTasks();
   }, []);
 
-  // Save categories to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem('crumblist-categories', JSON.stringify(categories));
+    localStorage.setItem("crumblist-categories", JSON.stringify(categories));
   }, [categories]);
 
   useEffect(() => {
@@ -154,11 +85,9 @@ function MyApp() {
     const fallbackQuotes = [
       "Stay focused and keep toasting.",
       "Small crumbs lead to big loaves.",
-      "No task is too crusty to conquer.",
+      "No task is too crusty to conquer."
     ];
-    const fallback =
-      fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
-
+    const fallback = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
     fetch("https://type.fit/api/quotes")
       .then((res) => res.json())
       .then((data) => {
@@ -174,24 +103,17 @@ function MyApp() {
 
   const toggleChecked = (taskId) => {
     setCheckedTasks((prev) =>
-      prev.includes(taskId)
-        ? prev.filter((id) => id !== taskId)
-        : [...prev, taskId]
+      prev.includes(taskId) ? prev.filter((id) => id !== taskId) : [...prev, taskId]
     );
   };
 
   const completeCheckedTasks = () => {
-    const updatedTasks = tasks.filter((task) => {
-      return !checkedTasks.includes(task._id);
-    });
-
+    const updatedTasks = tasks.filter((task) => !checkedTasks.includes(task._id));
     setTasks(updatedTasks);
     setCheckedTasks([]);
-
-    // Delete from backend
     checkedTasks.forEach((id) => {
       fetch(`https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/tasks/${id}`, {
-        method: "DELETE",
+        method: "DELETE"
       }).catch((err) => console.error("Delete failed", err));
     });
   };
@@ -203,127 +125,61 @@ function MyApp() {
   };
 
   const openCategoryModal = (categoryName) => {
-    setSelectedCategory(categoryName);
-  };
-
-  const closeCategoryModal = () => {
-    setSelectedCategory(null);
+    navigate(`/category/${categoryName}`);
   };
 
   return (
     <div className="pink-background">
-      {/* Hamburger Menu */}
-      <div
-        className="hamburger-menu"
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-      >
-        ☰
-      </div>
-
-      {/* Sidebar */}
-      <div ref={sidebarRef} className={`sidebar ${sidebarOpen ? "open" : ""}`}>
-        <button className="sidebar-close" onClick={() => setSidebarOpen(false)}>
-          ×
-        </button>
-        <ul>
-          <li>
-            <button
-              className="sidebar-link"
-              onClick={() => {
-                setActivePage("home");
-                setSidebarOpen(false);
-              }}
-            >
-              🏠 Home
-            </button>
-          </li>
-          <li>
-            <button 
-              className="sidebar-link"
-              onClick={() => {
-                setActivePage("calendar");
-                setSidebarOpen(false);
-              }}
-            >
-              📆 Calendar View
-            </button>
-          </li>
-          <li>
-            <button 
-              className="sidebar-link"
-              onClick={() => {
-                setActivePage("profile");
-                setSidebarOpen(false);
-              }}
-            >
-              👤 Profile
-            </button>
-          </li>
-          <li>
-            <button
-              className="sidebar-link"
-              onClick={() => {
-                setActivePage("settings");
-                setSidebarOpen(false);
-              }}
-            >
-              ⚙️ Settings
-            </button>
-          </li>
-        </ul>
-      </div>
-
-      {/* Settings Page */}
-      {activePage === "settings" && (
-        <div className="settings-page">
-          <h2>⚙️ Settings</h2>
-          <div className="settings-placeholder">
-            <p>🛠 Settings coming soon:</p>
-            <ul>
-              <li>Dark mode</li>
-              <li>Font size</li>
-              <li>Task sorting preferences</li>
-              <li>Show/hide motivational quotes</li>
-            </ul>
-          </div>
-        </div>
-      )}
-
-      {/* Calendar Page */}
-      {activePage === "calendar" && (
-        <div className="calendar-page">
-          <h2>📆 Calendar View</h2>
-          <div className="calendar-placeholder">
-            <p>📅 Calendar view coming soon!</p>
-            <p>Here you'll be able to see your tasks organized by due date.</p>
-          </div>
-        </div>
-      )}
-
-      {/* Profile Page */}
-      {activePage === "profile" && (
-        <div className="profile-page">
-          <h2>👤 Profile</h2>
-          <div className="profile-placeholder">
-            <p> Welcome to your profile!</p>
-            <p>Profile customization coming soon:</p>
-            <ul>
-              <li>Task completion statistics</li>
-              <li>Productivity insights</li>
-              <li>Achievement badges</li>
-            </ul>
-          </div>
-        </div>
-      )}
-
-      {/* Home Page */}
-      {activePage === "home" && (
+      {location.pathname.startsWith("/category/") ? (
+        <CategoryPage
+          tasks={tasks}
+          checkedTasks={checkedTasks}
+          toggleChecked={toggleChecked}
+        />
+      ) : (
         <>
+          {/* Hamburger Menu */}
+          <div
+            className="hamburger-menu"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            ☰
+          </div>
+
+          {/* Sidebar */}
+          <div ref={sidebarRef} className={`sidebar ${sidebarOpen ? "open" : ""}`}>
+            <button className="sidebar-close" onClick={() => setSidebarOpen(false)}>
+              ×
+            </button>
+            <ul>
+              <li>
+                <button className="sidebar-link" onClick={() => navigate("/")}>
+                  🏠 Home
+                </button>
+              </li>
+              <li>
+                <button className="sidebar-link" onClick={() => setSidebarOpen(false)}>
+                  📆 Calendar View
+                </button>
+              </li>
+              <li>
+                <button className="sidebar-link" onClick={() => setSidebarOpen(false)}>
+                  👤 Profile
+                </button>
+              </li>
+              <li>
+                <button className="sidebar-link" onClick={() => setSidebarOpen(false)}>
+                  ⚙️ Settings
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          {/* Home Page Content */}
           <div className="title-box">
             <h1>CrumbList 🥖</h1>
           </div>
 
-          {/* Category Grid */}
           <div className="category-grid">
             {categories.map((cat, index) => (
               <EditableCategory
@@ -337,45 +193,11 @@ function MyApp() {
             ))}
           </div>
 
-          {/* Category Modal */}
-          {selectedCategory && (
-            <div className="modal-overlay" onClick={closeCategoryModal}>
-              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-header">
-                  <h2>{selectedCategory} Tasks</h2>
-                  <button className="close-button" onClick={closeCategoryModal}>
-                    ×
-                  </button>
-                </div>
-                <div className="modal-body">
-                  {tasksByCategory[selectedCategory]?.length === 0 ? (
-                    <p>No tasks in this category yet.</p>
-                  ) : (
-                    <ul className="modal-task-list">
-                      {tasksByCategory[selectedCategory]?.map((task) => (
-                        <li key={task._id}>
-                          <label>
-                            <input
-                              type="checkbox"
-                              checked={checkedTasks.includes(task._id)}
-                              onChange={() => toggleChecked(task._id)}
-                            />
-                            <strong>{task.name}</strong> - {task.ease} minutes
-                            {task.description && <p>{task.description}</p>}
-                          </label>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Butter Tasks */}
           <div className="butter-row">
             <div className="butter-tasks">
-              <div className="butter-title">🧈 Butter Tasks <span className="task-count">({butterTasks.length})</span></div>
+              <div className="butter-title">
+                🧈 Butter Tasks <span className="task-count">({butterTasks.length})</span>
+              </div>
               {butterTasks.length === 0 ? (
                 <p className="no-butter">No quick tasks under 60 minutes yet.</p>
               ) : (
@@ -408,12 +230,10 @@ function MyApp() {
             </div>
           </div>
 
-          {/* Quote */}
           <div className="quote-box">
             <blockquote>{quote}</blockquote>
           </div>
 
-          {/* Toast Progress Bar */}
           <div className="toast-section">
             <h2>Toast Your Tasks…</h2>
             <div className="toast-bar-wrapper">
@@ -433,7 +253,7 @@ function MyApp() {
             </div>
           </div>
         </>
-      )}   
+      )}
     </div>
   );
 }
@@ -443,7 +263,7 @@ EditableCategory.propTypes = {
   index: PropTypes.number.isRequired,
   onNameChange: PropTypes.func.isRequired,
   taskCount: PropTypes.number,
-  onClick: PropTypes.func,
+  onClick: PropTypes.func
 };
 
 export default MyApp;
