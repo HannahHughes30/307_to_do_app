@@ -6,8 +6,20 @@ const CategoryPage = ({ tasks, checkedTasks, toggleChecked, completeCheckedTasks
   const navigate = useNavigate();
 
   const filteredTasks = tasks
-    .filter((task) => task.category?.toLowerCase() === categoryName.toLowerCase())
-    .sort((a, b) => new Date(a.due_date) - new Date(b.due_date)); // Sort by soonest due
+  .filter((task) => task.category?.toLowerCase() === categoryName.toLowerCase())
+  .sort((a, b) => {
+    const dateA = new Date(a.due_date);
+    const dateB = new Date(b.due_date);
+
+    // compare due dates first
+    if (dateA - dateB !== 0) {
+      return dateA - dateB;
+    }
+
+    // if dates are equal, sort by urgency (descending)
+    return Number(b.urgency) - Number(a.urgency);
+  });
+
 
   return (
     <div className="category-page">
