@@ -1215,6 +1215,12 @@ caption {
   font-size: 1.1rem;
 }
 
+.category-page {
+  padding: 1rem 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
 /* Task Count Styling */
 .task-count {
   font-size: 12px;
@@ -1615,6 +1621,24 @@ caption {
   color: #666;
   font-size: 14px;
 }
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.task-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
 
 /* === Motivational Quote Box === */
 .quote-box {
