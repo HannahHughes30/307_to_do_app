@@ -1494,7 +1494,9 @@ caption {
 }
 
 /* === Pages === */
-.settings-page, .calendar-page, .profile-page {
+.settings-page,
+.calendar-page,
+.profile-page {
   background: #fff8e1;
   color: #333;
   padding: 40px;
@@ -1506,10 +1508,12 @@ caption {
   text-align: left;
 }
 
-.settings-page h2, .calendar-page h2, .profile-page h2 {
+.settings-page h2,
+.calendar-page h2,
+.profile-page h2 {
   margin-top: 0;
   font-size: 1.6rem;
-  color: #8B4513;
+  color: #8b4513;
 }
 
 .settings-page label {
@@ -1519,7 +1523,9 @@ caption {
   font-weight: 500;
 }
 
-.settings-placeholder, .calendar-placeholder, .profile-placeholder {
+.settings-placeholder,
+.calendar-placeholder,
+.profile-placeholder {
   font-size: 0.95rem;
   margin-top: 20px;
   background: white;
@@ -1645,7 +1651,7 @@ caption {
 
 .modal-header h2 {
   margin: 0;
-  color: #8B4513;
+  color: #8b4513;
 }
 
 .close-button {
@@ -1702,7 +1708,7 @@ caption {
 }
 
 .modal-task-list strong {
-  color: #8B4513;
+  color: #8b4513;
 }
 
 .modal-task-list p {
@@ -1727,7 +1733,6 @@ caption {
   border-radius: 12px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
-
 
 /* === Motivational Quote Box === */
 .quote-box {
@@ -1821,14 +1826,14 @@ caption {
 .task-form input:focus,
 .task-form select:focus,
 .task-form textarea:focus {
-  border-color: #8B4513;
+  border-color: #8b4513;
   outline: none;
 }
 
 .task-form button {
   width: 100%;
   padding: 12px;
-  background: #8B4513;
+  background: #8b4513;
   color: white;
   border: none;
   border-radius: 6px;
@@ -1839,7 +1844,7 @@ caption {
 }
 
 .task-form button:hover {
-  background: #A0522D;
+  background: #a0522d;
 }
 
 /* Calendar View Button */
@@ -2798,9 +2803,6 @@ caption {
   background-color: #ffd878;
   color: #333;
 }
-
-
-
 
 /*
  * Navigation

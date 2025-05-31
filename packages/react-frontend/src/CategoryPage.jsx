@@ -1,29 +1,38 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { useParams, useNavigate } from "react-router-dom";
 
-const CategoryPage = ({ tasks, checkedTasks, toggleChecked, completeCheckedTasks }) => {
+const CategoryPage = ({
+  tasks,
+  checkedTasks,
+  toggleChecked,
+  completeCheckedTasks,
+}) => {
   const { categoryName } = useParams();
   const navigate = useNavigate();
 
   const filteredTasks = tasks
-  .filter((task) => task.category?.toLowerCase() === categoryName.toLowerCase())
-  .sort((a, b) => {
-    const dateA = new Date(a.due_date);
-    const dateB = new Date(b.due_date);
+    .filter(
+      (task) => task.category?.toLowerCase() === categoryName.toLowerCase(),
+    )
+    .sort((a, b) => {
+      const dateA = new Date(a.due_date);
+      const dateB = new Date(b.due_date);
 
-    // compare due dates first
-    if (dateA - dateB !== 0) {
-      return dateA - dateB;
-    }
+      // compare due dates first
+      if (dateA - dateB !== 0) {
+        return dateA - dateB;
+      }
 
-    // if dates are equal, sort by urgency (descending)
-    return Number(b.urgency) - Number(a.urgency);
-  });
-
+      // if dates are equal, sort by urgency (descending)
+      return Number(b.urgency) - Number(a.urgency);
+    });
 
   return (
     <div className="category-page">
-      <button className="back-button yellow" onClick={() => navigate(-1)}>← Back</button>
+      <button className="back-button yellow" onClick={() => navigate(-1)}>
+        ← Back
+      </button>
       <h2>{categoryName} Tasks</h2>
       {filteredTasks.length === 0 ? (
         <p>No tasks in this category yet.</p>
@@ -39,7 +48,9 @@ const CategoryPage = ({ tasks, checkedTasks, toggleChecked, completeCheckedTasks
               />
               <div>
                 <h3 style={{ marginBottom: "0.5rem" }}>{task.name}</h3>
-                <div>⏰ {task.ease} min | ⚠️ Urgency: {task.urgency}</div>
+                <div>
+                  ⏰ {task.ease} min | ⚠️ Urgency: {task.urgency}
+                </div>
                 <div>
                   📅 Due:{" "}
                   {task.due_date
@@ -67,7 +78,12 @@ const CategoryPage = ({ tasks, checkedTasks, toggleChecked, completeCheckedTasks
                 if (idsToDelete.length > 0) completeCheckedTasks(idsToDelete);
               }}
             >
-              Remove Selected ({filteredTasks.filter((task) => checkedTasks.includes(task._id)).length})
+              Remove Selected (
+              {
+                filteredTasks.filter((task) => checkedTasks.includes(task._id))
+                  .length
+              }
+              )
             </button>
           )}
           <button
@@ -76,13 +92,17 @@ const CategoryPage = ({ tasks, checkedTasks, toggleChecked, completeCheckedTasks
           >
             + Add Task
           </button>
-
         </div>
-
       )}
     </div>
-
   );
+};
+
+CategoryPage.propTypes = {
+  tasks: PropTypes.array.isRequired,
+  checkedTasks: PropTypes.array.isRequired,
+  toggleChecked: PropTypes.func.isRequired,
+  completeCheckedTasks: PropTypes.func.isRequired,
 };
 
 export default CategoryPage;
