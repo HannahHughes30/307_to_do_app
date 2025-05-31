@@ -5,7 +5,11 @@ import CategoryPage from "./CategoryPage";
 
 const EditableCategory = ({ name, taskCount, onClick }) => {
   return (
-    <div className="category-box" style={{ cursor: "pointer" }} onClick={onClick}>
+    <div
+      className="category-box"
+      style={{ cursor: "pointer" }}
+      onClick={onClick}
+    >
       <h3>{name}</h3>
       <p className="task-count">({taskCount} tasks)</p>
     </div>
@@ -32,27 +36,26 @@ function MyApp() {
           { name: "Errands" },
           { name: "Health" },
           { name: "Fitness" },
-          { name: "Chores" }
+          { name: "Chores" },
         ];
   });
 
   const butterTasks = tasks
-  .filter((task) => Number(task.ease) < 60)
-  .sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
+    .filter((task) => Number(task.ease) < 60)
+    .sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
 
   const normalTasks = tasks.filter((task) => Number(task.ease) >= 60);
   const butterTaskIds = butterTasks.map((task) => task._id);
-  const selectedButterIds = checkedTasks.filter((id) => butterTaskIds.includes(id));
+  const selectedButterIds = checkedTasks.filter((id) =>
+    butterTaskIds.includes(id),
+  );
 
   const tasksByCategory = {};
-    categories.forEach((cat) => {
-      tasksByCategory[cat.name] = normalTasks
-        .filter((task) => task.category?.toLowerCase() === cat.name.toLowerCase())
-        .sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
-    });
-
-
-
+  categories.forEach((cat) => {
+    tasksByCategory[cat.name] = normalTasks
+      .filter((task) => task.category?.toLowerCase() === cat.name.toLowerCase())
+      .sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
+  });
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -69,7 +72,9 @@ function MyApp() {
   }, [sidebarOpen]);
 
   useEffect(() => {
-    fetch("https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/tasks")
+    fetch(
+      "https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/tasks",
+    )
       .then((res) => res.json())
       .then((json) => setTasks(json.task_list || []))
       .catch((err) => {
@@ -93,9 +98,10 @@ function MyApp() {
     const fallbackQuotes = [
       "Stay focused and keep toasting.",
       "Small crumbs lead to big loaves.",
-      "No task is too crusty to conquer."
+      "No task is too crusty to conquer.",
     ];
-    const fallback = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
+    const fallback =
+      fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
     fetch("https://type.fit/api/quotes")
       .then((res) => res.json())
       .then((data) => {
@@ -103,7 +109,7 @@ function MyApp() {
         setQuote(
           random?.text
             ? `${random.text} – Mr. Crumb`
-            : `${fallback} – Mr. Crumb`
+            : `${fallback} – Mr. Crumb`,
         );
       })
       .catch(() => setQuote(`${fallback} – Mr. Crumb`));
@@ -111,20 +117,27 @@ function MyApp() {
 
   const toggleChecked = (taskId) => {
     setCheckedTasks((prev) =>
-      prev.includes(taskId) ? prev.filter((id) => id !== taskId) : [...prev, taskId]
+      prev.includes(taskId)
+        ? prev.filter((id) => id !== taskId)
+        : [...prev, taskId],
     );
   };
 
   const completeCheckedTasks = (idsToDelete = checkedTasks) => {
-    const updatedTasks = tasks.filter((task) => !idsToDelete.includes(task._id));
+    const updatedTasks = tasks.filter(
+      (task) => !idsToDelete.includes(task._id),
+    );
     setTasks(updatedTasks);
     setCheckedTasks((prev) => prev.filter((id) => !idsToDelete.includes(id)));
     idsToDelete.forEach((id) => {
-      fetch(`https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/tasks/${id}`, {
-        method: "DELETE"
-      }).catch((err) => console.error("Delete failed", err));
+      fetch(
+        `https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/tasks/${id}`,
+        {
+          method: "DELETE",
+        },
+      ).catch((err) => console.error("Delete failed", err));
     });
-  };  
+  };
 
   const updateCategoryName = (index, newName) => {
     const updated = [...categories];
@@ -156,8 +169,14 @@ function MyApp() {
           </div>
 
           {/* Sidebar */}
-          <div ref={sidebarRef} className={`sidebar ${sidebarOpen ? "open" : ""}`}>
-            <button className="sidebar-close" onClick={() => setSidebarOpen(false)}>
+          <div
+            ref={sidebarRef}
+            className={`sidebar ${sidebarOpen ? "open" : ""}`}
+          >
+            <button
+              className="sidebar-close"
+              onClick={() => setSidebarOpen(false)}
+            >
               ×
             </button>
             <ul>
@@ -167,17 +186,26 @@ function MyApp() {
                 </button>
               </li>
               <li>
-                <button className="sidebar-link" onClick={() => setSidebarOpen(false)}>
+                <button
+                  className="sidebar-link"
+                  onClick={() => setSidebarOpen(false)}
+                >
                   📆 Calendar View
                 </button>
               </li>
               <li>
-                <button className="sidebar-link" onClick={() => setSidebarOpen(false)}>
+                <button
+                  className="sidebar-link"
+                  onClick={() => setSidebarOpen(false)}
+                >
                   👤 Profile
                 </button>
               </li>
               <li>
-                <button className="sidebar-link" onClick={() => setSidebarOpen(false)}>
+                <button
+                  className="sidebar-link"
+                  onClick={() => setSidebarOpen(false)}
+                >
                   ⚙️ Settings
                 </button>
               </li>
@@ -205,15 +233,20 @@ function MyApp() {
           <div className="butter-row">
             <div className="butter-tasks">
               <div className="butter-title">
-                🧈 Butter Tasks <span className="task-count">({butterTasks.length})</span>
+                🧈 Butter Tasks{" "}
+                <span className="task-count">({butterTasks.length})</span>
               </div>
               {butterTasks.length === 0 ? (
-                <p className="no-butter">No quick tasks under 60 minutes yet.</p>
+                <p className="no-butter">
+                  No quick tasks under 60 minutes yet.
+                </p>
               ) : (
                 <div className="butter-task-grid">
                   {butterTasks.map((task) => (
                     <div key={task._id} className="butter-task-grid-row">
-                      <span>{task.name} ({task.ease} min)</span>
+                      <span>
+                        {task.name} ({task.ease} min)
+                      </span>
                       <input
                         type="checkbox"
                         checked={checkedTasks.includes(task._id)}
@@ -224,7 +257,10 @@ function MyApp() {
                 </div>
               )}
               {selectedButterIds.length > 0 && (
-                <button className="complete-button" onClick={() => completeCheckedTasks(selectedButterIds)}>
+                <button
+                  className="complete-button"
+                  onClick={() => completeCheckedTasks(selectedButterIds)}
+                >
                   Remove Selected ({selectedButterIds.length})
                 </button>
               )}
@@ -272,7 +308,7 @@ EditableCategory.propTypes = {
   index: PropTypes.number.isRequired,
   onNameChange: PropTypes.func.isRequired,
   taskCount: PropTypes.number,
-  onClick: PropTypes.func
+  onClick: PropTypes.func,
 };
 
 export default MyApp;

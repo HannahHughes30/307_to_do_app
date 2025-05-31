@@ -6,8 +6,6 @@ import MyApp from "./MyApp";
 import TaskFormPage from "./TaskFormPage";
 import Login from "./Login"; // also near your other imports
 import Signup from "./Signup";
-import CategoryPage from './CategoryPage';
-
 
 const container = document.getElementById("root");
 const root = createRoot(container);
@@ -23,5 +21,5 @@ root.render(
         <Route path="/category/:categoryName" element={<MyApp />} />
       </Routes>
     </BrowserRouter>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
