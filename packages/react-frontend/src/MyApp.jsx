@@ -53,17 +53,19 @@ function MyApp() {
   });
 
   // Task filtering
-  const butterTasks = tasks.filter((task) => Number(task.ease) < settings.butterThreshold);
-  const normalTasks = tasks.filter((task) => Number(task.ease) >= settings.butterThreshold);
+  const butterTasks = tasks
+  .filter((task) => Number(task.ease) < settings.butterThreshold)
+  .sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
+   const normalTasks = tasks.filter((task) => Number(task.ease) >= settings.butterThreshold);
   const butterTaskIds = butterTasks.map((task) => task._id);
   const selectedButterIds = checkedTasks.filter((id) => butterTaskIds.includes(id));
 
   const tasksByCategory = {};
-  categories.forEach((cat) => {
-    tasksByCategory[cat.name] = normalTasks.filter(
-      (task) => task.category?.toLowerCase() === cat.name.toLowerCase()
-    );
-  });
+    categories.forEach((cat) => {
+      tasksByCategory[cat.name] = normalTasks
+        .filter((task) => task.category?.toLowerCase() === cat.name.toLowerCase())
+        .sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
+    });
 
   // Save categories
   useEffect(() => {
