@@ -55,6 +55,8 @@ function MyApp() {
   // Task filtering
   const butterTasks = tasks.filter((task) => Number(task.ease) < settings.butterThreshold);
   const normalTasks = tasks.filter((task) => Number(task.ease) >= settings.butterThreshold);
+  const butterTaskIds = butterTasks.map((task) => task._id);
+  const selectedButterIds = checkedTasks.filter((id) => butterTaskIds.includes(id));
 
   const tasksByCategory = {};
   categories.forEach((cat) => {
@@ -140,16 +142,16 @@ function MyApp() {
     );
   };
 
-  const completeCheckedTasks = () => {
-    const updatedTasks = tasks.filter((task) => !checkedTasks.includes(task._id));
+  const completeCheckedTasks = (idsToDelete = checkedTasks) => {
+    const updatedTasks = tasks.filter((task) => !idsToDelete.includes(task._id));
     setTasks(updatedTasks);
-    setCheckedTasks([]);
-    checkedTasks.forEach((id) => {
+    setCheckedTasks((prev) => prev.filter((id) => !idsToDelete.includes(id)));
+    idsToDelete.forEach((id) => {
       fetch(`https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/tasks/${id}`, {
         method: "DELETE"
       }).catch((err) => console.error("Delete failed", err));
     });
-  };
+  };  
 
   const updateCategoryName = (index, newName) => {
     const updated = [...categories];
@@ -168,6 +170,7 @@ function MyApp() {
           tasks={tasks}
           checkedTasks={checkedTasks}
           toggleChecked={toggleChecked}
+          completeCheckedTasks={completeCheckedTasks}
         />
       ) : (
         <>
@@ -483,9 +486,9 @@ function MyApp() {
                   ))}
                 </div>
               )}
-              {checkedTasks.length > 0 && (
-                <button className="complete-button" onClick={completeCheckedTasks}>
-                  Remove Selected ({checkedTasks.length})
+              {selectedButterIds.length > 0 && (
+                <button className="complete-button" onClick={() => completeCheckedTasks(selectedButterIds)}>
+                  Remove Selected ({selectedButterIds.length})
                 </button>
               )}
             </div>
