@@ -11,7 +11,7 @@ const CategoryPage = ({ tasks, checkedTasks, toggleChecked, completeCheckedTasks
 
   return (
     <div className="category-page">
-      <button onClick={() => navigate(-1)}>← Back</button>
+      <button className="back-button yellow" onClick={() => navigate(-1)}>← Back</button>
       <h2>{categoryName} Tasks</h2>
       {filteredTasks.length === 0 ? (
         <p>No tasks in this category yet.</p>
@@ -47,27 +47,24 @@ const CategoryPage = ({ tasks, checkedTasks, toggleChecked, completeCheckedTasks
 
           {filteredTasks.some((task) => checkedTasks.includes(task._id)) && (
             <button
-              className="complete-button"
+              className="full-width-button remove"
               onClick={() => {
                 const idsToDelete = filteredTasks
                   .map((task) => task._id)
                   .filter((id) => checkedTasks.includes(id));
-                if (idsToDelete.length > 0) {
-                  completeCheckedTasks(idsToDelete); 
-                }
+                if (idsToDelete.length > 0) completeCheckedTasks(idsToDelete);
               }}
             >
               Remove Selected ({filteredTasks.filter((task) => checkedTasks.includes(task._id)).length})
             </button>
           )}
-
           <button
-            className="add-task-button"
-            style={{ marginTop: "1rem" }}
+            className="full-width-button add"
             onClick={() => navigate("/add-task")}
           >
             + Add Task
           </button>
+
         </div>
 
       )}

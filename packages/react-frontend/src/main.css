@@ -1784,6 +1784,47 @@ caption {
   background: #A0522D;
 }
 
+/* add and remove task button same size  */
+.full-width-button {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  text-align: center;
+  cursor: pointer;
+  margin-top: 1rem;
+  margin: 0;
+}
+
+.full-width-button.remove {
+  background-color: #28a745;
+  color: white;
+  border: none;
+}
+
+.full-width-button.add {
+  background-color: #ffda77;
+  color: #333;
+  border: none;
+}
+
+/* back button in category page  */
+.back-button.yellow {
+  background-color: #ffda77;
+  color: #333;
+  border: none;
+  font-weight: bold;
+}
+
+.back-button.yellow:hover {
+  background-color: #ffd878;
+  color: #333;
+}
+
+
+
+
 /*
  * Navigation
  */
