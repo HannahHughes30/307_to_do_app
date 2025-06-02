@@ -2,6 +2,215 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
+// Cute Bread Component
+const CuteBread = ({ size = "40px", className = "" }) => {
+  return (
+    <div className={`cute-bread ${className}`} style={{ width: size, height: size }}>
+      <div className="bread-body">
+        <div className="bread-eyes">
+          <div className="eye left-eye"></div>
+          <div className="eye right-eye"></div>
+        </div>
+        <div className="bread-mouth"></div>
+        <div className="bread-cheeks">
+          <div className="cheek left-cheek"></div>
+          <div className="cheek right-cheek"></div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+CuteBread.propTypes = {
+  size: PropTypes.string,
+  className: PropTypes.string,
+};
+
+// Calendar Component
+const CalendarView = ({ tasks }) => {
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  // Get urgency color
+  const getUrgencyColor = (urgency) => {
+    if (urgency <= 2) return "#28a745"; // Green (low)
+    if (urgency <= 4) return "#ffc107"; // Yellow
+    if (urgency <= 6) return "#fd7e14"; // Orange
+    if (urgency <= 8) return "#dc3545"; // Red
+    return "#6f42c1"; // Purple (highest)
+  };
+
+  // Get tasks for a specific date
+  const getTasksForDate = (date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    return tasks.filter(task => {
+      if (!task.due_date) return false;
+      const taskDate = new Date(task.due_date).toISOString().split('T')[0];
+      return taskDate === dateStr;
+    });
+  };
+
+  // Generate calendar days
+  const getDaysInMonth = () => {
+    const firstDay = new Date(currentYear, currentMonth, 1);
+    const lastDay = new Date(currentYear, currentMonth + 1, 0);
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+    const days = [];
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 41); // 6 weeks
+
+    for (let date = new Date(startDate); date < endDate; date.setDate(date.getDate() + 1)) {
+      days.push(new Date(date));
+    }
+    return days;
+  };
+
+  const days = getDaysInMonth();
+  const today = new Date();
+
+  const navigateMonth = (direction) => {
+    if (direction === 'prev') {
+      if (currentMonth === 0) {
+        setCurrentMonth(11);
+        setCurrentYear(currentYear - 1);
+      } else {
+        setCurrentMonth(currentMonth - 1);
+      }
+    } else {
+      if (currentMonth === 11) {
+        setCurrentMonth(0);
+        setCurrentYear(currentYear + 1);
+      } else {
+        setCurrentMonth(currentMonth + 1);
+      }
+    }
+  };
+
+  return (
+    <div className="calendar-container">
+      <div className="calendar-header">
+        <h2>📆 Calendar View</h2>
+        <div className="calendar-navigation">
+          <button className="nav-btn" onClick={() => navigateMonth('prev')}>&lt;</button>
+          <span className="calendar-month-year">
+            {months[currentMonth]} {currentYear}
+          </span>
+          <button className="nav-btn" onClick={() => navigateMonth('next')}>&gt;</button>
+        </div>
+      </div>
+
+      <div className="calendar-grid">
+        <div className="calendar-weekdays">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+            <div key={day} className="calendar-weekday">{day}</div>
+          ))}
+        </div>
+
+        <div className="calendar-days">
+          {days.map((date, index) => {
+            const dayTasks = getTasksForDate(date);
+            const isCurrentMonth = date.getMonth() === currentMonth;
+            const isToday = date.toDateString() === today.toDateString();
+            const isSelected = selectedDate && date.toDateString() === selectedDate.toDateString();
+
+            return (
+              <div
+                key={index}
+                className={`calendar-day ${!isCurrentMonth ? 'other-month' : ''} ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''}`}
+                onClick={() => setSelectedDate(date)}
+              >
+                <div className="calendar-day-number">{date.getDate()}</div>
+                {dayTasks.length > 0 && (
+                  <div className="calendar-tasks">
+                    {dayTasks.slice(0, 3).map((task, i) => (
+                      <div
+                        key={i}
+                        className="calendar-task-dot"
+                        style={{ backgroundColor: getUrgencyColor(task.urgency) }}
+                        title={`${task.name} (Urgency: ${task.urgency})`}
+                      />
+                    ))}
+                    {dayTasks.length > 3 && (
+                      <div className="calendar-task-more">+{dayTasks.length - 3}</div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Selected Date Details */}
+      {selectedDate && (
+        <div className="calendar-selected-date">
+          <h3>Tasks for {selectedDate.toLocaleDateString()}</h3>
+          {getTasksForDate(selectedDate).length === 0 ? (
+            <p>No tasks scheduled for this date.</p>
+          ) : (
+            <div className="calendar-task-list">
+              {getTasksForDate(selectedDate).map(task => (
+                <div key={task._id} className="calendar-task-item">
+                  <div
+                    className="task-urgency-dot"
+                    style={{ backgroundColor: getUrgencyColor(task.urgency) }}
+                  />
+                  <div className="task-details">
+                    <strong>{task.name}</strong>
+                    <div className="task-meta">
+                      {task.category} • {task.ease} min • Urgency: {task.urgency}/10
+                    </div>
+                    {task.description && <p className="task-description">{task.description}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Legend */}
+      <div className="calendar-legend">
+        <h4>Urgency Scale:</h4>
+        <div className="legend-items">
+          <div className="legend-item">
+            <div className="legend-dot" style={{ backgroundColor: "#28a745" }}></div>
+            <span>Low (1-2)</span>
+          </div>
+          <div className="legend-item">
+            <div className="legend-dot" style={{ backgroundColor: "#ffc107" }}></div>
+            <span>Medium (3-4)</span>
+          </div>
+          <div className="legend-item">
+            <div className="legend-dot" style={{ backgroundColor: "#fd7e14" }}></div>
+            <span>High (5-6)</span>
+          </div>
+          <div className="legend-item">
+            <div className="legend-dot" style={{ backgroundColor: "#dc3545" }}></div>
+            <span>Urgent (7-8)</span>
+          </div>
+          <div className="legend-item">
+            <div className="legend-dot" style={{ backgroundColor: "#6f42c1" }}></div>
+            <span>Critical (9-10)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+CalendarView.propTypes = {
+  tasks: PropTypes.array.isRequired,
+};
+
 const EditableCategory = ({ name, index, onNameChange, taskCount, onClick }) => {
   const [editing, setEditing] = useState(false);
   const [tempName, setTempName] = useState(name);
@@ -69,12 +278,36 @@ function MyApp() {
   const [tasks, setTasks] = useState([]);
   const [checkedTasks, setCheckedTasks] = useState([]);
   const [progress, setProgress] = useState(0);
-  const [quote, setQuote] = useState("Loading...");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activePage, setActivePage] = useState("home");
   const navigate = useNavigate();
   const sidebarRef = useRef();
+
+  // Bread-themed quotes
+  const breadQuotes = [
+    "Stay focused and keep toasting.",
+    "Small crumbs lead to big loaves.",
+    "No task is too crusty to conquer.",
+    "Rise to the occasion like good dough.",
+    "Every great achievement starts with a single grain.",
+    "Knead your goals until they're perfect.",
+    "Life is what you bake it.",
+    "Don't loaf around - get things done!",
+    "You're the yeast that makes things rise.",
+    "Success is a recipe worth following.",
+    "Proof that hard work pays off.",
+    "Butter believe in yourself!",
+    "Time to roll up your sleeves and get baking.",
+    "Fresh starts are like warm bread - always better.",
+    "Slice through challenges one task at a time."
+  ];
+
+  // Random quote that changes on each render/refresh
+  const [quote] = useState(() => {
+    const randomQuote = breadQuotes[Math.floor(Math.random() * breadQuotes.length)];
+    return `${randomQuote} – Mr. Crumb`;
+  });
 
   // Initialize categories from localStorage or use defaults
   const [categories, setCategories] = useState(() => {
@@ -149,28 +382,6 @@ function MyApp() {
     const percent = total === 0 ? 100 : Math.round((completed / total) * 100);
     setProgress(percent);
   }, [checkedTasks, tasks]);
-
-  useEffect(() => {
-    const fallbackQuotes = [
-      "Stay focused and keep toasting.",
-      "Small crumbs lead to big loaves.",
-      "No task is too crusty to conquer.",
-    ];
-    const fallback =
-      fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
-
-    fetch("https://type.fit/api/quotes")
-      .then((res) => res.json())
-      .then((data) => {
-        const random = data[Math.floor(Math.random() * data.length)];
-        setQuote(
-          random?.text
-            ? `${random.text} – Mr. Crumb`
-            : `${fallback} – Mr. Crumb`
-        );
-      })
-      .catch(() => setQuote(`${fallback} – Mr. Crumb`));
-  }, []);
 
   const toggleChecked = (taskId) => {
     setCheckedTasks((prev) =>
@@ -292,11 +503,7 @@ function MyApp() {
       {/* Calendar Page */}
       {activePage === "calendar" && (
         <div className="calendar-page">
-          <h2>📆 Calendar View</h2>
-          <div className="calendar-placeholder">
-            <p>📅 Calendar view coming soon!</p>
-            <p>Here you'll be able to see your tasks organized by due date.</p>
-          </div>
+          <CalendarView tasks={tasks} />
         </div>
       )}
 
@@ -320,7 +527,9 @@ function MyApp() {
       {activePage === "home" && (
         <>
           <div className="title-box">
-            <h1>CrumbList 🥖</h1>
+            <h1>
+              CrumbList <CuteBread size="50px" />
+            </h1>
           </div>
 
           {/* Category Grid */}
@@ -404,6 +613,12 @@ function MyApp() {
                 onClick={() => navigate("/add-task")}
               >
                 Add Task
+              </button>
+              <button
+                className="calendar-view-button"
+                onClick={() => setActivePage("calendar")}
+              >
+                📅 Calendar View
               </button>
             </div>
           </div>
