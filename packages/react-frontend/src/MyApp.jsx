@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
-// Cute Bread Component
+// Simple Cute Bread Component (Stationary)
 const CuteBread = ({ size = "40px", className = "" }) => {
   return (
     <div className={`cute-bread ${className}`} style={{ width: size, height: size }}>
@@ -27,7 +27,7 @@ CuteBread.propTypes = {
 };
 
 // Calendar Component
-const CalendarView = ({ tasks }) => {
+const CalendarView = ({ tasks, showButterTasks }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [selectedDate, setSelectedDate] = useState(null);
@@ -49,11 +49,18 @@ const CalendarView = ({ tasks }) => {
   // Get tasks for a specific date
   const getTasksForDate = (date) => {
     const dateStr = date.toISOString().split('T')[0];
-    return tasks.filter(task => {
+    let filteredTasks = tasks.filter(task => {
       if (!task.due_date) return false;
       const taskDate = new Date(task.due_date).toISOString().split('T')[0];
       return taskDate === dateStr;
     });
+
+    // Filter out butter tasks if setting is disabled
+    if (!showButterTasks) {
+      filteredTasks = filteredTasks.filter(task => Number(task.ease) >= 60);
+    }
+
+    return filteredTasks;
   };
 
   // Generate calendar days
@@ -209,6 +216,7 @@ const CalendarView = ({ tasks }) => {
 
 CalendarView.propTypes = {
   tasks: PropTypes.array.isRequired,
+  showButterTasks: PropTypes.bool,
 };
 
 const EditableCategory = ({ name, index, onNameChange, taskCount, onClick }) => {
@@ -284,6 +292,18 @@ function MyApp() {
   const navigate = useNavigate();
   const sidebarRef = useRef();
 
+  // Settings state
+  const [settings, setSettings] = useState(() => {
+    const savedSettings = localStorage.getItem('crumblist-settings');
+    return savedSettings ? JSON.parse(savedSettings) : {
+      darkMode: false,
+      butterThreshold: 60,
+      showButterInCalendar: true,
+      dailyQuotes: false,
+      colorTheme: 'pink'
+    };
+  });
+
   // Bread-themed quotes
   const breadQuotes = [
     "Stay focused and keep toasting.",
@@ -325,8 +345,8 @@ function MyApp() {
     ];
   });
 
-  const butterTasks = tasks.filter((task) => Number(task.ease) < 60);
-  const normalTasks = tasks.filter((task) => Number(task.ease) >= 60);
+  const butterTasks = tasks.filter((task) => Number(task.ease) < settings.butterThreshold);
+  const normalTasks = tasks.filter((task) => Number(task.ease) >= settings.butterThreshold);
 
   // Group normal tasks by category
   const tasksByCategory = {};
@@ -335,6 +355,78 @@ function MyApp() {
       (task) => task.category === cat.name
     );
   });
+
+  // Apply theme class to body
+  useEffect(() => {
+    document.body.className = `theme-${settings.colorTheme} ${settings.darkMode ? 'dark-mode' : ''}`;
+    
+    // Apply theme to pink-background class
+    const pinkBg = document.querySelector('.pink-background');
+    if (pinkBg) {
+      pinkBg.className = `pink-background theme-${settings.colorTheme} ${settings.darkMode ? 'dark-mode' : ''}`;
+    }
+  }, [settings.darkMode, settings.colorTheme]);
+
+  // Save settings to localStorage
+  useEffect(() => {
+    localStorage.setItem('crumblist-settings', JSON.stringify(settings));
+  }, [settings]);
+
+  // Daily quote notification
+  useEffect(() => {
+    if (settings.dailyQuotes) {
+      const lastQuoteDate = localStorage.getItem('last-quote-date');
+      const today = new Date().toDateString();
+      
+      if (lastQuoteDate !== today) {
+        const randomQuote = breadQuotes[Math.floor(Math.random() * breadQuotes.length)];
+        if (Notification.permission === 'granted') {
+          new Notification('Daily Motivation from Mr. Crumb', {
+            body: randomQuote,
+            icon: '🍞'
+          });
+        }
+        localStorage.setItem('last-quote-date', today);
+      }
+    }
+  }, [settings.dailyQuotes]);
+
+  // Request notification permission
+  const requestNotificationPermission = () => {
+    if ('Notification' in window) {
+      Notification.requestPermission();
+    }
+  };
+
+  // Settings update functions
+  const updateSetting = (key, value) => {
+    setSettings(prev => ({ ...prev, [key]: value }));
+  };
+
+  const clearCompletedTasks = () => {
+    if (window.confirm('Are you sure you want to clear all completed tasks? This cannot be undone.')) {
+      // Here you would implement clearing completed tasks from your backend
+      console.log('Clearing completed tasks...');
+      // For now, just show an alert
+      alert('Completed tasks cleared!');
+    }
+  };
+
+  const resetCategoriesToDefault = () => {
+    if (window.confirm('Reset categories to default? This will remove any custom categories you\'ve created.')) {
+      const defaultCategories = [
+        { name: "School" },
+        { name: "Work" },
+        { name: "Errands" },
+        { name: "Health" },
+        { name: "Fitness" },
+        { name: "Chores" }
+      ];
+      setCategories(defaultCategories);
+      localStorage.setItem('crumblist-categories', JSON.stringify(defaultCategories));
+      alert('Categories reset to default!');
+    }
+  };
 
   // Close sidebar when clicking outside
   useEffect(() => {
@@ -422,7 +514,7 @@ function MyApp() {
   };
 
   return (
-    <div className="pink-background">
+    <div className={`pink-background theme-${settings.colorTheme} ${settings.darkMode ? 'dark-mode' : ''}`}>
       {/* Hamburger Menu */}
       <div
         className="hamburger-menu"
@@ -488,14 +580,102 @@ function MyApp() {
       {activePage === "settings" && (
         <div className="settings-page">
           <h2>⚙️ Settings</h2>
-          <div className="settings-placeholder">
-            <p>🛠 Settings coming soon:</p>
-            <ul>
-              <li>Dark mode</li>
-              <li>Font size</li>
-              <li>Task sorting preferences</li>
-              <li>Show/hide motivational quotes</li>
-            </ul>
+          <div className="settings-content">
+            
+            {/* Theme Settings */}
+            <div className="settings-section">
+              <h3>🎨 Theme & Appearance</h3>
+              <div className="setting-item">
+                <label>
+                  <input 
+                    type="checkbox" 
+                    checked={settings.darkMode}
+                    onChange={(e) => updateSetting('darkMode', e.target.checked)}
+                  /> 
+                  Enable Dark Mode
+                </label>
+              </div>
+              <div className="setting-item">
+                <label>
+                  Color Theme:
+                  <select 
+                    value={settings.colorTheme} 
+                    onChange={(e) => updateSetting('colorTheme', e.target.value)}
+                  >
+                    <option value="pink">Pink (Default)</option>
+                    <option value="blue">Blue Pastel</option>
+                    <option value="green">Green Pastel</option>
+                    <option value="purple">Purple Pastel</option>
+                    <option value="orange">Orange Pastel</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+
+            {/* Task Settings */}
+            <div className="settings-section">
+              <h3>🧈 Butter Task Settings</h3>
+              <div className="setting-item">
+                <label>
+                  Butter task threshold (tasks under this duration):
+                  <select 
+                    value={settings.butterThreshold} 
+                    onChange={(e) => updateSetting('butterThreshold', Number(e.target.value))}
+                  >
+                    <option value="30">30 minutes</option>
+                    <option value="45">45 minutes</option>
+                    <option value="60">60 minutes</option>
+                    <option value="90">90 minutes</option>
+                  </select>
+                </label>
+              </div>
+              <div className="setting-item">
+                <label>
+                  <input 
+                    type="checkbox" 
+                    checked={settings.showButterInCalendar}
+                    onChange={(e) => updateSetting('showButterInCalendar', e.target.checked)}
+                  /> 
+                  Show butter tasks in calendar view
+                </label>
+              </div>
+            </div>
+
+            {/* Notification Settings */}
+            <div className="settings-section">
+              <h3>🔔 Notifications</h3>
+              <div className="setting-item">
+                <label>
+                  <input 
+                    type="checkbox" 
+                    checked={settings.dailyQuotes}
+                    onChange={(e) => {
+                      updateSetting('dailyQuotes', e.target.checked);
+                      if (e.target.checked) {
+                        requestNotificationPermission();
+                      }
+                    }}
+                  /> 
+                  Daily motivation quote notifications
+                </label>
+              </div>
+            </div>
+
+            {/* Data Settings */}
+            <div className="settings-section">
+              <h3>💾 Data Management</h3>
+              <div className="setting-item">
+                <button className="settings-button danger-btn" onClick={clearCompletedTasks}>
+                  🗑️ Clear All Completed Tasks
+                </button>
+              </div>
+              <div className="setting-item">
+                <button className="settings-button warning-btn" onClick={resetCategoriesToDefault}>
+                  🔄 Reset Categories to Default
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
       )}
@@ -503,7 +683,7 @@ function MyApp() {
       {/* Calendar Page */}
       {activePage === "calendar" && (
         <div className="calendar-page">
-          <CalendarView tasks={tasks} />
+          <CalendarView tasks={tasks} showButterTasks={settings.showButterInCalendar} />
         </div>
       )}
 
@@ -586,7 +766,7 @@ function MyApp() {
             <div className="butter-tasks">
               <div className="butter-title">🧈 Butter Tasks <span className="task-count">({butterTasks.length})</span></div>
               {butterTasks.length === 0 ? (
-                <p className="no-butter">No quick tasks under 60 minutes yet.</p>
+                <p className="no-butter">No quick tasks under {settings.butterThreshold} minutes yet.</p>
               ) : (
                 <div className="butter-task-grid">
                   {butterTasks.map((task) => (
@@ -644,7 +824,7 @@ function MyApp() {
                     : `Task Progress (${progress}%)`}
                 </div>
               </div>
-              <span className="emoji-bread">🍞</span>
+	      <span className="emoji-bread">🍞</span>
             </div>
           </div>
         </>

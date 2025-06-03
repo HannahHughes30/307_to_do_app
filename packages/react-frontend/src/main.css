@@ -1172,6 +1172,9 @@ caption {
   background-color: #f49ac2;
   min-height: 100vh;
   padding: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .title-box {
@@ -1179,6 +1182,8 @@ caption {
   padding: 2rem 0 1rem;
   font-size: 2rem;
   font-weight: bold;
+  max-width: 900px;
+  width: 100%;
 }
 
 .category-grid {
@@ -1188,6 +1193,7 @@ caption {
   max-width: 900px;
   margin: 0 auto;
   padding: 1rem;
+  width: 100%;
 }
 
 .category-box {
@@ -1237,6 +1243,7 @@ caption {
   max-width: 900px;
   margin: 2rem auto;
   gap: 1.5rem;
+  width: 100%;
 }
 
 .butter-tasks {
@@ -1350,6 +1357,8 @@ caption {
   margin-top: 40px;
   padding-bottom: 40px;
   position: relative;
+  max-width: 900px;
+  width: 100%;
 }
 
 .toast-bar-wrapper {
@@ -1486,7 +1495,7 @@ caption {
   margin: 40px auto;
   border-radius: 12px;
   width: 90%;
-  max-width: 600px;
+  max-width: 900px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
   text-align: left;
 }
@@ -1511,6 +1520,86 @@ caption {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* === Settings Page Styles === */
+.settings-content {
+  display: grid;
+  gap: 2rem;
+}
+
+.settings-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.settings-section h3 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.2rem;
+  border-bottom: 2px solid #f49ac2;
+  padding-bottom: 0.5rem;
+}
+
+.setting-item {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.setting-item label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  margin: 0;
+}
+
+.setting-item input[type="checkbox"] {
+  transform: scale(1.2);
+  accent-color: #f49ac2;
+}
+
+.setting-item select {
+  padding: 0.5rem;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+}
+
+.settings-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.danger-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.danger-btn:hover {
+  background: #c82333;
+}
+
+.warning-btn {
+  background: #ffc107;
+  color: #333;
+}
+
+.warning-btn:hover {
+  background: #e0a800;
 }
 
 /* === Modal Styles === */
@@ -1621,7 +1710,8 @@ caption {
   border-left: 5px solid #ffc107;
   padding: 15px 20px;
   margin: 20px auto;
-  width: 80%;
+  max-width: 900px;
+  width: 100%;
   font-style: italic;
   color: #333;
   border-radius: 6px;
@@ -1681,38 +1771,6 @@ caption {
   color: white;
 }
 
-/* === Dark Mode === */
-.dark-mode {
-  background-color: #1e1e1e;
-  color: #f5f5f5;
-}
-
-.dark-mode .toast-bar {
-  background-color: #333;
-}
-
-.dark-mode .toast-fill {
-  background-color: #8b4513;
-}
-
-.dark-mode .quote-box,
-.dark-mode .settings-page,
-.dark-mode .calendar-page,
-.dark-mode .profile-page {
-  background-color: #2c2c2c;
-  color: #f5f5f5;
-  border-color: #555;
-}
-
-.dark-mode .sidebar {
-  background-color: #2c2c2c;
-}
-
-.dark-mode .hamburger-menu {
-  background-color: #2c2c2c;
-  color: white;
-}
-
 /* Task Form Styles */
 .task-form {
   background: white;
@@ -1758,6 +1816,7 @@ caption {
 .task-form button:hover {
   background: #A0522D;
 }
+
 /* Calendar View Button */
 .calendar-view-button {
   background: linear-gradient(135deg, #ff6b9d, #ff8a9b);
@@ -2091,66 +2150,276 @@ caption {
     min-width: auto;
     font-size: 1.2em;
   }
+  
+  .settings-page {
+    padding: 1rem;
+  }
+  
+  .setting-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
+
+/* === Cute Bread Component === */
 .cute-bread {
-   display: inline-block;
-   position: relative;
-   margin: 0 5px;
-   vertical-align: middle;
-   width: 45px;
-   height: 50px;
+  display: inline-block;
+  position: relative;
+  vertical-align: bottom; /* This aligns it with the bottom of the text */
+  margin-left: 10px; /* Add some space between text and bread */
 }
 .bread-body {
-   width: 75%;
-   height: 80%;
-   position: relative;
-   background: #f4d67c;
-   border-radius: 45% 45% 15% 15%;
+  width: 83%;
+  height: 90%;
+  position: relative;
+  background: #f4d67c;
+  border-radius: 45% 45% 15% 15%;
+  border: 2px solid #e6ac00;
 }
-/* Bread Eyes */
+
 .bread-eyes {
-   position: absolute;
-   top: 35%;
-   left: 50%;
-   transform: translateX(-50%);
-   display: flex;
-   gap: 8px;
-   z-index: 10;
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 10;
 }
-.eye {
-   width: 4px;
-   height: 4px;
-   background: #2c3e50;
-   border-radius: 50%;
+
+.eye, .left-eye, .right-eye {
+  width: 3px;
+  height: 3px;
+  background: #2c3e50;
+  border-radius: 50%;
 }
-/* Bread Mouth */
+
 .bread-mouth {
-   position: absolute;
-   top: 45%;
-   left: 50%;
-   transform: translateX(-50%);
-   width: 8px;
-   height: 4px;
-   border-radius: 0 0 8px 8px;
-   background: #2c3e50;
-   z-index: 10;
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 3px;
+  border-radius: 0 0 6px 6px;
+  background: #2c3e50;
+  z-index: 10;
 }
-/* Bread Cheeks */
+
 .bread-cheeks {
-   position: absolute;
-   top: 42%;
-   left: 50%;
-   transform: translateX(-50%);
-   display: flex;
-   gap: 16px;
-   z-index: 10;
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 10;
 }
-.cheek {
-   width: 6px;
-   height: 6px;
-   background: #ff9999;
-   border-radius: 50%;
-   opacity: 0.8;
+
+.cheek, .left-cheek, .right-cheek {
+  width: 4px;
+  height: 4px;
+  background: #ff9999;
+  border-radius: 50%;
+  opacity: 0.8;
+}
+
+/* === Color Themes === */
+.theme-pink {
+  background-color: #f49ac2 !important;
+}
+
+.theme-blue {
+  background-color: #a8d8f0 !important;
+}
+
+.theme-green {
+  background-color: #a8e6a3 !important;
+}
+
+.theme-purple {
+  background-color: #d4a8e6 !important;
+}
+
+.theme-orange {
+  background-color: #f0c48a !important;
+}
+
+/* Theme-specific butter task colors */
+.theme-blue .butter-tasks {
+  background: #e3f2fd;
+  border-color: #2196f3;
+}
+
+.theme-green .butter-tasks {
+  background: #e8f5e8;
+  border-color: #4caf50;
+}
+
+.theme-purple .butter-tasks {
+  background: #f3e5f5;
+  border-color: #9c27b0;
+}
+
+.theme-orange .butter-tasks {
+  background: #fff3e0;
+  border-color: #ff9800;
+}
+
+/* === Dark Mode === */
+.dark-mode {
+  background-color: #1e1e1e !important;
+  color: #f5f5f5 !important;
+}
+
+.dark-mode .butter-tasks {
+  background: #2c2c2c !important;
+  border-color: #ffc107 !important;
+  color: #f5f5f5 !important;
+}
+
+.dark-mode .butter-title {
+  background-color: #3c3c3c !important;
+  color: #f5f5f5 !important;
+}
+
+.dark-mode .butter-task-grid-row {
+  background: #333 !important;
+  color: #f5f5f5 !important;
+}
+
+.dark-mode .no-butter {
+  color: #ccc !important;
+}
+
+.dark-mode .category-box {
+  background-color: #4a3a2a !important;
+  color: #f5f5f5 !important;
+}
+
+.dark-mode .settings-section {
+  background: #2c2c2c !important;
+  color: #f5f5f5 !important;
+}
+
+.dark-mode .settings-section h3 {
+  color: #f5f5f5 !important;
+  border-bottom-color: #ffc107 !important;
+}
+
+.dark-mode .setting-item label {
+  color: #f5f5f5 !important;
+}
+
+.dark-mode .setting-item select {
+  background: #3c3c3c !important;
+  color: #f5f5f5 !important;
+  border-color: #555 !important;
+}
+
+.dark-mode .quote-box {
+  background-color: #2c2c2c !important;
+  color: #f5f5f5 !important;
+  border-left-color: #ffc107 !important;
+}
+
+.dark-mode .settings-page,
+.dark-mode .calendar-page,
+.dark-mode .profile-page {
+  background: #2c2c2c !important;
+  color: #f5f5f5 !important;
+}
+
+.dark-mode .modal-content {
+  background: #2c2c2c !important;
+  color: #f5f5f5 !important;
+}
+
+.dark-mode .modal-header h2 {
+  color: #ffc107 !important;
+}
+
+.dark-mode .modal-task-list li {
+  border-bottom-color: #444 !important;
+}
+
+.dark-mode .modal-task-list strong {
+  color: #ffc107 !important;
+}
+
+.dark-mode .calendar-container {
+  background: #2c2c2c !important;
+  color: #f5f5f5 !important;
+}
+
+.dark-mode .calendar-header h2 {
+  color: #ffc107 !important;
+}
+
+.dark-mode .calendar-month-year {
+  color: #f5f5f5 !important;
+}
+
+.dark-mode .calendar-day {
+  background: #3c3c3c !important;
+  border-color: #555 !important;
+  color: #f5f5f5 !important;
+}
+
+.dark-mode .calendar-day:hover {
+  background: #4c4c4c !important;
+}
+
+.dark-mode .calendar-selected-date {
+  background: #2c2c2c !important;
+  border-color: #ffc107 !important;
+  color: #f5f5f5 !important;
+}
+
+.dark-mode .calendar-task-item {
+  background: #3c3c3c !important;
+  color: #f5f5f5 !important;
+}
+
+.dark-mode .calendar-legend {
+  background: #2c2c2c !important;
+  color: #f5f5f5 !important;
+}
+
+.dark-mode .toast-bar {
+  background-color: #333 !important;
+}
+
+.dark-mode .toast-fill {
+  background-color: #8b4513 !important;
+}
+
+.dark-mode .sidebar {
+  background-color: #2c2c2c !important;
+}
+
+.dark-mode .hamburger-menu {
+  background-color: #2c2c2c !important;
+  color: white !important;
+}
+.title-box h1 {
+  display: flex;
+  align-items: flex-end; /* Aligns items to bottom baseline */
+  justify-content: center;
+  gap: 5px; /* Small gap between text and bread */
+}
+
+.title-box .cute-bread {
+  margin-bottom: 0px;
+}
+
+.toast-bar-wrapper .cute-bread {
+  display: none; /* Hide the cute bread in toast bar */
+}
+
+.emoji-bread {
+  font-size: 1.8rem; /* Keep the emoji toast */
+  display: inline-block; /* Make sure it shows */
 }
 /*
  * Navigation
