@@ -28,7 +28,7 @@ const Login = () => {
       }
 
       alert("Login successful!");
-      navigate("/");
+      navigate("/MyApp");
     } catch (err) {
       console.error("Login error:", err);
       alert("Something went wrong.");
