@@ -28,4 +28,3 @@ To avoid manual formatting and linting:
 
 - **Run Prettier **:  
   npm run format
-

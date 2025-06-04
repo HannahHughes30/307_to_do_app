@@ -3,6 +3,9 @@ import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import taskFunction from "./task-functions.js";
+import User from "./models/user.js";
+
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 8000;

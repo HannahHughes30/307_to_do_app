@@ -7,8 +7,18 @@ const CalendarView = ({ tasks, showButterTasks }) => {
   const [selectedDate, setSelectedDate] = useState(null);
 
   const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
   // Get urgency color
@@ -22,16 +32,16 @@ const CalendarView = ({ tasks, showButterTasks }) => {
 
   // Get tasks for a specific date
   const getTasksForDate = (date) => {
-    const dateStr = date.toISOString().split('T')[0];
-    let filteredTasks = tasks.filter(task => {
+    const dateStr = date.toISOString().split("T")[0];
+    let filteredTasks = tasks.filter((task) => {
       if (!task.due_date) return false;
-      const taskDate = new Date(task.due_date).toISOString().split('T')[0];
+      const taskDate = new Date(task.due_date).toISOString().split("T")[0];
       return taskDate === dateStr;
     });
 
     // Filter out butter tasks if setting is disabled
     if (!showButterTasks) {
-      filteredTasks = filteredTasks.filter(task => Number(task.ease) >= 60);
+      filteredTasks = filteredTasks.filter((task) => Number(task.ease) >= 60);
     }
 
     return filteredTasks;
@@ -40,7 +50,6 @@ const CalendarView = ({ tasks, showButterTasks }) => {
   // Generate calendar days
   const getDaysInMonth = () => {
     const firstDay = new Date(currentYear, currentMonth, 1);
-    const lastDay = new Date(currentYear, currentMonth + 1, 0);
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - firstDay.getDay());
 
@@ -48,7 +57,11 @@ const CalendarView = ({ tasks, showButterTasks }) => {
     const endDate = new Date(startDate);
     endDate.setDate(endDate.getDate() + 41); // 6 weeks
 
-    for (let date = new Date(startDate); date < endDate; date.setDate(date.getDate() + 1)) {
+    for (
+      let date = new Date(startDate);
+      date < endDate;
+      date.setDate(date.getDate() + 1)
+    ) {
       days.push(new Date(date));
     }
     return days;
@@ -58,7 +71,7 @@ const CalendarView = ({ tasks, showButterTasks }) => {
   const today = new Date();
 
   const navigateMonth = (direction) => {
-    if (direction === 'prev') {
+    if (direction === "prev") {
       if (currentMonth === 0) {
         setCurrentMonth(11);
         setCurrentYear(currentYear - 1);
@@ -80,18 +93,24 @@ const CalendarView = ({ tasks, showButterTasks }) => {
       <div className="calendar-header">
         <h2>📆 Calendar View</h2>
         <div className="calendar-navigation">
-          <button className="nav-btn" onClick={() => navigateMonth('prev')}>&lt;</button>
+          <button className="nav-btn" onClick={() => navigateMonth("prev")}>
+            &lt;
+          </button>
           <span className="calendar-month-year">
             {months[currentMonth]} {currentYear}
           </span>
-          <button className="nav-btn" onClick={() => navigateMonth('next')}>&gt;</button>
+          <button className="nav-btn" onClick={() => navigateMonth("next")}>
+            &gt;
+          </button>
         </div>
       </div>
 
       <div className="calendar-grid">
         <div className="calendar-weekdays">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="calendar-weekday">{day}</div>
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+            <div key={day} className="calendar-weekday">
+              {day}
+            </div>
           ))}
         </div>
 
@@ -100,12 +119,14 @@ const CalendarView = ({ tasks, showButterTasks }) => {
             const dayTasks = getTasksForDate(date);
             const isCurrentMonth = date.getMonth() === currentMonth;
             const isToday = date.toDateString() === today.toDateString();
-            const isSelected = selectedDate && date.toDateString() === selectedDate.toDateString();
+            const isSelected =
+              selectedDate &&
+              date.toDateString() === selectedDate.toDateString();
 
             return (
               <div
                 key={index}
-                className={`calendar-day ${!isCurrentMonth ? 'other-month' : ''} ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''}`}
+                className={`calendar-day ${!isCurrentMonth ? "other-month" : ""} ${isToday ? "today" : ""} ${isSelected ? "selected" : ""}`}
                 onClick={() => setSelectedDate(date)}
               >
                 <div className="calendar-day-number">{date.getDate()}</div>
@@ -115,12 +136,16 @@ const CalendarView = ({ tasks, showButterTasks }) => {
                       <div
                         key={i}
                         className="calendar-task-dot"
-                        style={{ backgroundColor: getUrgencyColor(task.urgency || 5) }}
+                        style={{
+                          backgroundColor: getUrgencyColor(task.urgency || 5),
+                        }}
                         title={`${task.name} (Urgency: ${task.urgency || 5})`}
                       />
                     ))}
                     {dayTasks.length > 3 && (
-                      <div className="calendar-task-more">+{dayTasks.length - 3}</div>
+                      <div className="calendar-task-more">
+                        +{dayTasks.length - 3}
+                      </div>
                     )}
                   </div>
                 )}
@@ -138,18 +163,23 @@ const CalendarView = ({ tasks, showButterTasks }) => {
             <p>No tasks scheduled for this date.</p>
           ) : (
             <div className="calendar-task-list">
-              {getTasksForDate(selectedDate).map(task => (
+              {getTasksForDate(selectedDate).map((task) => (
                 <div key={task._id} className="calendar-task-item">
                   <div
                     className="task-urgency-dot"
-                    style={{ backgroundColor: getUrgencyColor(task.urgency || 5) }}
+                    style={{
+                      backgroundColor: getUrgencyColor(task.urgency || 5),
+                    }}
                   />
                   <div className="task-details">
                     <strong>{task.name}</strong>
                     <div className="task-meta">
-                      {task.category} • {task.ease} min • Urgency: {task.urgency || 5}/10
+                      {task.category} • {task.ease} min • Urgency:{" "}
+                      {task.urgency || 5}/10
                     </div>
-                    {task.description && <p className="task-description">{task.description}</p>}
+                    {task.description && (
+                      <p className="task-description">{task.description}</p>
+                    )}
                   </div>
                 </div>
               ))}
@@ -163,23 +193,38 @@ const CalendarView = ({ tasks, showButterTasks }) => {
         <h4>Urgency Scale:</h4>
         <div className="legend-items">
           <div className="legend-item">
-            <div className="legend-dot" style={{ backgroundColor: "#28a745" }}></div>
+            <div
+              className="legend-dot"
+              style={{ backgroundColor: "#28a745" }}
+            ></div>
             <span>Low (1-2)</span>
           </div>
           <div className="legend-item">
-            <div className="legend-dot" style={{ backgroundColor: "#ffc107" }}></div>
+            <div
+              className="legend-dot"
+              style={{ backgroundColor: "#ffc107" }}
+            ></div>
             <span>Medium (3-4)</span>
           </div>
           <div className="legend-item">
-            <div className="legend-dot" style={{ backgroundColor: "#fd7e14" }}></div>
+            <div
+              className="legend-dot"
+              style={{ backgroundColor: "#fd7e14" }}
+            ></div>
             <span>High (5-6)</span>
           </div>
           <div className="legend-item">
-            <div className="legend-dot" style={{ backgroundColor: "#dc3545" }}></div>
+            <div
+              className="legend-dot"
+              style={{ backgroundColor: "#dc3545" }}
+            ></div>
             <span>Urgent (7-8)</span>
           </div>
           <div className="legend-item">
-            <div className="legend-dot" style={{ backgroundColor: "#6f42c1" }}></div>
+            <div
+              className="legend-dot"
+              style={{ backgroundColor: "#6f42c1" }}
+            ></div>
             <span>Critical (9-10)</span>
           </div>
         </div>

@@ -3,7 +3,10 @@ import PropTypes from "prop-types";
 
 const CuteBread = ({ size = "40px", className = "" }) => {
   return (
-    <div className={`cute-bread ${className}`} style={{ width: size, height: size }}>
+    <div
+      className={`cute-bread ${className}`}
+      style={{ width: size, height: size }}
+    >
       <div className="bread-body">
         <div className="bread-eyes">
           <div className="eye left-eye"></div>

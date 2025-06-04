@@ -1544,7 +1544,7 @@ caption {
   background: white;
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .settings-section h3 {
@@ -2152,39 +2152,39 @@ caption {
     padding: 15px;
     margin: 10px;
   }
-  
+
   .calendar-header {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .calendar-day {
     min-height: 70px;
     padding: 5px;
   }
-  
+
   .calendar-day-number {
     font-size: 0.8em;
   }
-  
+
   .calendar-task-dot {
     width: 6px;
     height: 6px;
   }
-  
+
   .legend-items {
     justify-content: center;
   }
-  
+
   .calendar-month-year {
     min-width: auto;
     font-size: 1.2em;
   }
-  
+
   .settings-page {
     padding: 1rem;
   }
-  
+
   .setting-item {
     flex-direction: column;
     align-items: flex-start;
@@ -2217,7 +2217,9 @@ caption {
   z-index: 10;
 }
 
-.eye, .left-eye, .right-eye {
+.eye,
+.left-eye,
+.right-eye {
   width: 3px;
   height: 3px;
   background: #2c3e50;
@@ -2246,7 +2248,9 @@ caption {
   z-index: 10;
 }
 
-.cheek, .left-cheek, .right-cheek {
+.cheek,
+.left-cheek,
+.right-cheek {
   width: 4px;
   height: 4px;
   background: #ff9999;
@@ -2500,7 +2504,7 @@ caption {
 .profile-title {
   font-size: 2.5rem;
   font-weight: bold;
-  color: #8B4513;
+  color: #8b4513;
   margin: 0 0 10px 0;
   cursor: pointer;
   transition: color 0.2s ease;
@@ -2536,7 +2540,7 @@ caption {
 .title-input {
   font-size: 2.5rem;
   font-weight: bold;
-  color: #8B4513;
+  color: #8b4513;
 }
 
 .name-input {
@@ -2616,7 +2620,7 @@ caption {
 }
 
 .profile-achievements h3 {
-  color: #8B4513;
+  color: #8b4513;
   font-size: 1.4rem;
   margin-bottom: 20px;
   text-align: center;
@@ -2730,37 +2734,37 @@ caption {
     padding: 20px;
     margin: 20px auto;
   }
-  
+
   .profile-actions {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .signout-btn {
     width: 200px;
   }
-  
+
   .profile-stats {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .achievement-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .profile-title {
     font-size: 2rem;
   }
-  
+
   .profile-name {
     font-size: 1.1rem;
   }
-  
+
   .avatar-circle {
     width: 100px;
     height: 100px;
   }
-  
+
   .avatar-icon {
     width: 50px;
     height: 50px;

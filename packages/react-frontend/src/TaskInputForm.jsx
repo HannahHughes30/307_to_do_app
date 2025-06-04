@@ -41,7 +41,6 @@ const TaskInputForm = ({ onSubmit, categories }) => {
         Number(task.expectedTime.toString().replace(/\D/g, "")) ||
         Number(task.expectedTime),
     };
-    
 
     console.log("Submitting task:", backendTask);
     onSubmit(backendTask);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export const useTasks = () => {
   const [tasks, setTasks] = useState([]);
@@ -7,7 +7,9 @@ export const useTasks = () => {
 
   // Fetch tasks from backend
   const fetchTasks = () => {
-    fetch("https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/tasks")
+    fetch(
+      "https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/tasks",
+    )
       .then((res) => res.json())
       .then((json) => {
         console.log("Fetched tasks:", json.task_list);
@@ -35,7 +37,7 @@ export const useTasks = () => {
     setCheckedTasks((prev) =>
       prev.includes(taskId)
         ? prev.filter((id) => id !== taskId)
-        : [...prev, taskId]
+        : [...prev, taskId],
     );
   };
 
@@ -49,9 +51,12 @@ export const useTasks = () => {
 
     // Delete from backend
     checkedTasks.forEach((id) => {
-      fetch(`https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/tasks/${id}`, {
-        method: "DELETE",
-      }).catch((err) => console.error("Delete failed", err));
+      fetch(
+        `https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/tasks/${id}`,
+        {
+          method: "DELETE",
+        },
+      ).catch((err) => console.error("Delete failed", err));
     });
   };
 
@@ -61,6 +66,6 @@ export const useTasks = () => {
     progress,
     toggleChecked,
     completeCheckedTasks,
-    fetchTasks
+    fetchTasks,
   };
 };
