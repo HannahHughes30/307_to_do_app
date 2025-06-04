@@ -35,12 +35,13 @@ const TaskInputForm = ({ onSubmit, categories }) => {
       name: task.title,
       category: task.category,
       description: task.notes,
-      due_date: task.dueDate,
+      due_date: `${task.dueDate}T12:00:00.000Z`, // 👈 Fix here
       urgency: Number(task.urgency),
       ease:
         Number(task.expectedTime.toString().replace(/\D/g, "")) ||
-        Number(task.expectedTime), // Remove non-digits
+        Number(task.expectedTime),
     };
+    
 
     console.log("Submitting task:", backendTask);
     onSubmit(backendTask);

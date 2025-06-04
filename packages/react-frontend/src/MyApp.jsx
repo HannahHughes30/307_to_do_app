@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import CuteBread from "./CuteBread";
 import CalendarView from "./CalendarView";
-import EditableCategory from "./EditableCategory";
 import { useSettings } from "./useSettings";
 import { useTasks } from "./useTasks";
 import { useProfile } from "./useProfile";
@@ -11,32 +9,72 @@ import { useNavigate, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import CategoryPage from "./CategoryPage";
 
-const EditableCategory = ({ name, taskCount, onClick }) => {
+const EditableCategory = ({ name, index, taskCount, onNameChange, onClick }) => {
+  const [editing, setEditing] = useState(false);
+  const [tempName, setTempName] = useState(name);
+
+  const handleBlur = () => {
+    if (tempName.trim() && tempName !== name) {
+      onNameChange(index, tempName.trim());
+    }
+    setEditing(false);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleBlur();
+    } else if (e.key === "Escape") {
+      setTempName(name);
+      setEditing(false);
+    }
+  };
+
   return (
-    <div
-      className="category-box"
-      style={{ cursor: "pointer" }}
-      onClick={onClick}
-    >
-      <h3>{name}</h3>
+    <div className="category-box" style={{ cursor: "pointer" }} onClick={onClick}>
+      {editing ? (
+        <input
+          type="text"
+          value={tempName}
+          autoFocus
+          onChange={(e) => setTempName(e.target.value)}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          className="category-edit-input"
+        />
+      ) : (
+        <h3
+          className="category-name"
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent triggering category click
+            setEditing(true);
+          }}
+        >
+          {name}
+        </h3>
+      )}
       <p className="task-count">({taskCount} tasks)</p>
     </div>
   );
 };
+
 
 function MyApp() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const sidebarRef = useRef();
+  const [tasks, setTasks] = useState([]);
+  const [checkedTasks, setCheckedTasks] = useState([]);
+  const [progress, setProgress] = useState(0);
+  const [activePage, setActivePage] = useState("home");
 
   // Custom hooks
   const { settings, updateSetting, requestNotificationPermission, clearCompletedTasks, resetCategoriesToDefault } = useSettings();
-  const { tasks, checkedTasks, progress, toggleChecked, completeCheckedTasks } = useTasks();
   const { userProfile, editingProfile, updateProfile, handleProfileKeyDown } = useProfile();
 
   // Quote state
-  const [quote] = useState(() => {
+  const [quote, setQuote] = useState(() => {
     const randomQuote = breadQuotes[Math.floor(Math.random() * breadQuotes.length)];
     return `${randomQuote} – Mr. Crumb`;
   });
@@ -73,6 +111,8 @@ function MyApp() {
       .sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
   });
 
+  const achievements = getAchievements(tasks, butterTasks, progress, checkedTasks, categories);
+
   // Save categories
   useEffect(() => {
     localStorage.setItem('crumblist-categories', JSON.stringify(categories));
@@ -104,16 +144,21 @@ function MyApp() {
 
   // Helper functions
   useEffect(() => {
-    fetch(
-      "https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/tasks",
-    )
+    fetch("https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/tasks")
       .then((res) => res.json())
-      .then((json) => setTasks(json.task_list || []))
+      .then((json) => {
+        const taskList = Array.isArray(json.task_list) ? json.task_list : [];
+        console.log("✅ Tasks fetched from backend:", taskList); // ← Add this
+        setTasks(taskList);
+      })
       .catch((err) => {
         console.error("Error fetching tasks:", err);
         setTasks([]);
       });
   }, []);
+  
+  
+  
 
   useEffect(() => {
     localStorage.setItem("crumblist-categories", JSON.stringify(categories));
@@ -199,171 +244,197 @@ function MyApp() {
           >
             ☰
           </div>
-
-      {/* Sidebar */}
-      <div ref={sidebarRef} className={`sidebar ${sidebarOpen ? "open" : ""}`}>
-        <button className="sidebar-close" onClick={() => setSidebarOpen(false)}>
-          ×
-        </button>
-        <ul>
-          <li>
+  
+          {/* Sidebar */}
+          <div
+            ref={sidebarRef}
+            className={`sidebar ${sidebarOpen ? "open" : ""}`}
+          >
             <button
-              className="sidebar-link"
-              onClick={() => {
-                setActivePage("home");
-                setSidebarOpen(false);
-              }}
+              className="sidebar-close"
+              onClick={() => setSidebarOpen(false)}
             >
-              🏠 Home
+              ×
             </button>
-          </li>
-          <li>
-            <button 
-              className="sidebar-link"
-              onClick={() => {
-                setActivePage("calendar");
-                setSidebarOpen(false);
-              }}
-            >
-              📆 Calendar View
-            </button>
-          </li>
-          <li>
-            <button 
-              className="sidebar-link"
-              onClick={() => {
-                setActivePage("profile");
-                setSidebarOpen(false);
-              }}
-            >
-              👤 Profile
-            </button>
-          </li>
-          <li>
-            <button
-              className="sidebar-link"
-              onClick={() => {
-                setActivePage("settings");
-                setSidebarOpen(false);
-              }}
-            >
-              ⚙️ Settings
-            </button>
-          </li>
-        </ul>
-      </div>
-
-      {/* Settings Page */}
-      {activePage === "settings" && (
-        <div className="settings-page">
-          <h2>⚙️ Settings</h2>
-          <div className="settings-content">
-            
-            {/* Theme Settings */}
-            <div className="settings-section">
-              <h3>🎨 Theme & Appearance</h3>
-              <div className="setting-item">
-                <label>
-                  <input 
-                    type="checkbox" 
-                    checked={settings.darkMode}
-                    onChange={(e) => updateSetting('darkMode', e.target.checked)}
-                  /> 
-                  Enable Dark Mode
-                </label>
-              </div>
-              <div className="setting-item">
-                <label>
-                  Color Theme:
-                  <select 
-                    value={settings.colorTheme} 
-                    onChange={(e) => updateSetting('colorTheme', e.target.value)}
-                  >
-                    <option value="pink">Pink (Default)</option>
-                    <option value="blue">Blue Pastel</option>
-                    <option value="green">Green Pastel</option>
-                    <option value="purple">Purple Pastel</option>
-                    <option value="orange">Orange Pastel</option>
-                  </select>
-                </label>
-              </div>
-            </div>
-
-            {/* Task Settings */}
-            <div className="settings-section">
-              <h3>🧈 Butter Task Settings</h3>
-              <div className="setting-item">
-                <label>
-                  Butter task threshold (tasks under this duration):
-                  <select 
-                    value={settings.butterThreshold} 
-                    onChange={(e) => updateSetting('butterThreshold', Number(e.target.value))}
-                  >
-                    <option value="30">30 minutes</option>
-                    <option value="45">45 minutes</option>
-                    <option value="60">60 minutes</option>
-                    <option value="90">90 minutes</option>
-                  </select>
-                </label>
-              </div>
-              <div className="setting-item">
-                <label>
-                  <input 
-                    type="checkbox" 
-                    checked={settings.showButterInCalendar}
-                    onChange={(e) => updateSetting('showButterInCalendar', e.target.checked)}
-                  /> 
-                  Show butter tasks in calendar view
-                </label>
-              </div>
-            </div>
-
-            {/* Notification Settings */}
-            <div className="settings-section">
-              <h3>🔔 Notifications</h3>
-              <div className="setting-item">
-                <label>
-                  <input 
-                    type="checkbox" 
-                    checked={settings.dailyQuotes}
-                    onChange={(e) => {
-                      updateSetting('dailyQuotes', e.target.checked);
-                      if (e.target.checked) {
-                        requestNotificationPermission();
-                      }
-                    }}
-                  /> 
-                  Daily motivation quote notifications
-                </label>
-              </div>
-            </div>
-
-            {/* Data Settings */}
-            <div className="settings-section">
-              <h3>💾 Data Management</h3>
-              <div className="setting-item">
-                <button className="settings-button danger-btn" onClick={clearCompletedTasks}>
-                  🗑️ Clear All Completed Tasks
+            <ul>
+              <li>
+                <button
+                  className="sidebar-link"
+                  onClick={() => {
+                    setActivePage("home");
+                    setSidebarOpen(false);
+                  }}
+                >
+                  🏠 Home
                 </button>
-              </div>
-              <div className="setting-item">
-                <button className="settings-button warning-btn" onClick={() => resetCategoriesToDefault(setCategories)}>
-                  🔄 Reset Categories to Default
+              </li>
+              <li>
+                <button
+                  className="sidebar-link"
+                  onClick={() => {
+                    setActivePage("calendar");
+                    setSidebarOpen(false);
+                  }}
+                >
+                  📆 Calendar View
                 </button>
-              </div>
-            </div>
-
+              </li>
+              <li>
+                <button
+                  className="sidebar-link"
+                  onClick={() => {
+                    setActivePage("profile");
+                    setSidebarOpen(false);
+                  }}
+                >
+                  👤 Profile
+                </button>
+              </li>
+              <li>
+                <button
+                  className="sidebar-link"
+                  onClick={() => {
+                    setActivePage("settings");
+                    setSidebarOpen(false);
+                  }}
+                >
+                  ⚙️ Settings
+                </button>
+              </li>
+            </ul>
           </div>
-
-      {/* Calendar Page */}
-      {activePage === "calendar" && (
-        <div className="calendar-page">
-          <CalendarView tasks={tasks} showButterTasks={settings.showButterInCalendar} />
-        </div>
-      )}
-
-      {/* Profile Page */}
-      {activePage === "profile" && (
+  
+          {/* Settings Page */}
+          {activePage === "settings" && (
+            <div className="settings-page">
+              <h2>⚙️ Settings</h2>
+              <div className="settings-content">
+                {/* Theme Settings */}
+                <div className="settings-section">
+                  <h3>🎨 Theme & Appearance</h3>
+                  <div className="setting-item">
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={settings.darkMode}
+                        onChange={(e) =>
+                          updateSetting("darkMode", e.target.checked)
+                        }
+                      />
+                      Enable Dark Mode
+                    </label>
+                  </div>
+                  <div className="setting-item">
+                    <label>
+                      Color Theme:
+                      <select
+                        value={settings.colorTheme}
+                        onChange={(e) =>
+                          updateSetting("colorTheme", e.target.value)
+                        }
+                      >
+                        <option value="pink">Pink (Default)</option>
+                        <option value="blue">Blue Pastel</option>
+                        <option value="green">Green Pastel</option>
+                        <option value="purple">Purple Pastel</option>
+                        <option value="orange">Orange Pastel</option>
+                      </select>
+                    </label>
+                  </div>
+                </div>
+  
+                {/* Task Settings */}
+                <div className="settings-section">
+                  <h3>🧈 Butter Task Settings</h3>
+                  <div className="setting-item">
+                    <label>
+                      Butter task threshold (tasks under this duration):
+                      <select
+                        value={settings.butterThreshold}
+                        onChange={(e) =>
+                          updateSetting("butterThreshold", Number(e.target.value))
+                        }
+                      >
+                        <option value="30">30 minutes</option>
+                        <option value="45">45 minutes</option>
+                        <option value="60">60 minutes</option>
+                        <option value="90">90 minutes</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div className="setting-item">
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={settings.showButterInCalendar}
+                        onChange={(e) =>
+                          updateSetting(
+                            "showButterInCalendar",
+                            e.target.checked
+                          )
+                        }
+                      />
+                      Show butter tasks in calendar view
+                    </label>
+                  </div>
+                </div>
+  
+                {/* Notification Settings */}
+                <div className="settings-section">
+                  <h3>🔔 Notifications</h3>
+                  <div className="setting-item">
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={settings.dailyQuotes}
+                        onChange={(e) => {
+                          updateSetting("dailyQuotes", e.target.checked);
+                          if (e.target.checked) {
+                            requestNotificationPermission();
+                          }
+                        }}
+                      />
+                      Daily motivation quote notifications
+                    </label>
+                  </div>
+                </div>
+  
+                {/* Data Settings */}
+                <div className="settings-section">
+                  <h3>💾 Data Management</h3>
+                  <div className="setting-item">
+                    <button
+                      className="settings-button danger-btn"
+                      onClick={clearCompletedTasks}
+                    >
+                      🗑️ Clear All Completed Tasks
+                    </button>
+                  </div>
+                  <div className="setting-item">
+                    <button
+                      className="settings-button warning-btn"
+                      onClick={() => resetCategoriesToDefault(setCategories)}
+                    >
+                      🔄 Reset Categories to Default
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+  
+          {/* Calendar Page */}
+          {activePage === "calendar" && (
+            <div className="calendar-page">
+              <CalendarView
+                tasks={tasks}
+                showButterTasks={settings.showButterInCalendar}
+              />
+            </div>
+          )}
+  
+          {/* Profile Page */}
+          {activePage === "profile" && (
         <div className="profile-page">
           <div className="profile-header">
             <div className="profile-avatar">
@@ -388,7 +459,7 @@ function MyApp() {
               ) : (
                 <h1 
                   className="profile-title"
-                  onClick={() => updateProfile('editTitle', true)}
+                  onClick={() => setEditingProfile(prev => ({ ...prev, title: true }))}
                 >
                   {userProfile.title}
                 </h1>
@@ -406,7 +477,7 @@ function MyApp() {
               ) : (
                 <p 
                   className="profile-name"
-                  onClick={() => updateProfile('editName', true)}
+                  onClick={() => setEditingProfile(prev => ({ ...prev, name: true }))}
                 >
                   {userProfile.name}
                 </p>
@@ -415,10 +486,12 @@ function MyApp() {
           </div>
 
           <div className="profile-stats">
-            <div className="stat-card">
-              <div className="stat-number">{tasks.length}</div>
-              <div className="stat-label">Total Tasks</div>
+          <div className="stat-card">
+            <div className="stat-number">
+              {Array.isArray(tasks) ? tasks.length : 0}
             </div>
+            <div className="stat-label">Total Tasks</div>
+          </div>
             <div className="stat-card">
               <div className="stat-number">{checkedTasks.length}</div>
               <div className="stat-label">Completed Today</div>
@@ -442,7 +515,7 @@ function MyApp() {
           <div className="profile-achievements">
             <h3>🏆 Achievements</h3>
             <div className="achievement-grid">
-              {getAchievements(tasks, butterTasks, progress, checkedTasks, categories).map((achievement, index) => (
+              {achievements.map((achievement, index) => (
                 <div key={index} className="achievement-badge">
                   <div className="badge-icon">{achievement.icon}</div>
                   <div className="badge-content">
@@ -451,7 +524,7 @@ function MyApp() {
                   </div>
                 </div>
               ))}
-              {getAchievements(tasks, butterTasks, progress, checkedTasks, categories).length === 0 && (
+              {achievements.length === 0 && (
                 <div className="no-achievements">
                   <p>Complete tasks to unlock achievements! 🎯</p>
                 </div>
@@ -460,114 +533,119 @@ function MyApp() {
           </div>
         </div>
       )}
-
-      {/* Home Page */}
-      {activePage === "home" && (
-        <>
-          <div className="title-box">
-            <h1>
-              CrumbList <CuteBread size="35px" />
-            </h1>
-          </div>
-
-          <div className="category-grid">
-            {categories.map((cat, index) => (
-              <EditableCategory
-                key={index}
-                name={cat.name}
-                index={index}
-                onNameChange={updateCategoryName}
-                taskCount={tasksByCategory[cat.name]?.length || 0}
-                onClick={() => openCategoryModal(cat.name)}
-              />
-            ))}
-          </div>
-
-          <div className="butter-row">
-            <div className="butter-tasks">
-              <div className="butter-title">
-                🧈 Butter Tasks{" "}
-                <span className="task-count">({butterTasks.length})</span>
+  
+          {/* Home Page */}
+          {activePage === "home" && (
+            <>
+              <div className="title-box">
+                <h1>
+                  CrumbList <CuteBread size="35px" />
+                </h1>
               </div>
-              {butterTasks.length === 0 ? (
-                <p className="no-butter">
-                  No quick tasks under 60 minutes yet.
-                </p>
-              ) : (
-                <div className="butter-task-grid">
-                  {butterTasks.map((task) => (
-                    <div key={task._id} className="butter-task-grid-row">
-                      <span>
-                        {task.name} ({task.ease} min)
-                      </span>
-                      <input
-                        type="checkbox"
-                        checked={checkedTasks.includes(task._id)}
-                        onChange={() => toggleChecked(task._id)}
-                      />
+
+              <div className="category-grid">
+                {categories.map((cat, index) => (
+                  <EditableCategory
+                    key={index}
+                    name={cat.name}
+                    index={index}
+                    onNameChange={updateCategoryName}
+                    taskCount={tasksByCategory[cat.name]?.length || 0}
+                    onClick={() => openCategoryModal(cat.name)}
+                  />
+                ))}
+              </div>
+
+              <div className="butter-row">
+                <div className="butter-tasks">
+                  <div className="butter-title">
+                    🧈 Butter Tasks{" "}
+                    <span className="task-count">({butterTasks.length})</span>
+                  </div>
+                  {butterTasks.length === 0 ? (
+                    <p className="no-butter">No quick tasks under 60 minutes yet.</p>
+                  ) : (
+                    <div className="butter-task-grid">
+                      {butterTasks.map((task) => (
+                        <div key={task._id} className="butter-task-grid-row">
+                          <span>
+                            {task.name} ({task.ease} min)
+                          </span>
+                          <input
+                            type="checkbox"
+                            checked={checkedTasks.includes(task._id)}
+                            onChange={() => toggleChecked(task._id)}
+                          />
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
+                  {selectedButterIds.length > 0 && (
+                    <button
+                      className="complete-button"
+                      onClick={() => completeCheckedTasks(selectedButterIds)}
+                    >
+                      Remove Selected ({selectedButterIds.length})
+                    </button>
+                  )}
                 </div>
-              )}
-              {selectedButterIds.length > 0 && (
-                <button
-                  className="complete-button"
-                  onClick={() => completeCheckedTasks(selectedButterIds)}
-                >
-                  Remove Selected ({selectedButterIds.length})
-                </button>
-              )}
-            </div>
-            <div className="button-col">
-              <button
-                className="add-task-button"
-                onClick={() => navigate("/add-task")}
-              >
-                Add Task
-              </button>
-              <button
-                className="calendar-view-button"
-                onClick={() => setActivePage("calendar")}
-              >
-                📅 Calendar View
-              </button>
-            </div>
-          </div>
-
-          <div className="quote-box">
-            <blockquote>{quote}</blockquote>
-          </div>
-
-          <div className="toast-section">
-            <h2>Toast Your Tasks…</h2>
-            <div className="toast-bar-wrapper">
-              <div className="emoji-fire">🔥</div>
-              <div className="toast-bar">
-                <div
-                  className="toast-fill"
-                  style={{ width: `${progress}%` }}
-                ></div>
-                <div className="toast-text">
-                  {progress === 100
-                    ? "100% Completed!"
-                    : `Task Progress (${progress}%)`}
+                <div className="button-col">
+                  <button
+                    className="add-task-button"
+                    onClick={() => navigate("/add-task")}
+                  >
+                    Add Task
+                  </button>
+                  <button
+                    className="calendar-view-button"
+                    onClick={() => setActivePage("calendar")}
+                  >
+                    📅 Calendar View
+                  </button>
                 </div>
               </div>
-              <span className="emoji-bread">🍞</span>
-            </div>
-          </div>
+
+              <div className="quote-box">
+                <blockquote>{quote}</blockquote>
+              </div>
+
+              <div className="toast-section">
+                <h2>Toast Your Tasks…</h2>
+                <div className="toast-bar-wrapper">
+                  <div className="emoji-fire">🔥</div>
+                  <div className="toast-bar">
+                    <div
+                      className="toast-fill"
+                      style={{ width: `${progress}%` }}
+                    ></div>
+                    <div className="toast-text">
+                      {progress === 100
+                        ? "100% Completed!"
+                        : `Task Progress (${progress}%)`}
+                    </div>
+                  </div>
+                  <span className="emoji-bread">🍞</span>
+                </div>
+              </div>
+            </>
+          )}
+
         </>
       )}
     </div>
+
   );
+  
 }
 
 EditableCategory.propTypes = {
-  name: PropTypes.string.isRequired,
+  // name: PropTypes.string.isRequired,
   index: PropTypes.number.isRequired,
   onNameChange: PropTypes.func.isRequired,
   taskCount: PropTypes.number,
   onClick: PropTypes.func,
 };
 
+
+      
 export default MyApp;

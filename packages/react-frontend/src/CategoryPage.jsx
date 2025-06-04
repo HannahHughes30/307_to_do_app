@@ -18,15 +18,18 @@ const CategoryPage = ({
     .sort((a, b) => {
       const dateA = new Date(a.due_date);
       const dateB = new Date(b.due_date);
-
-      // compare due dates first
-      if (dateA - dateB !== 0) {
-        return dateA - dateB;
+    
+      // compare only year, month, and day
+      const dayA = dateA.getFullYear() * 10000 + (dateA.getMonth() + 1) * 100 + dateA.getDate();
+      const dayB = dateB.getFullYear() * 10000 + (dateB.getMonth() + 1) * 100 + dateB.getDate();
+    
+      if (dayA !== dayB) {
+        return dayA - dayB; // earlier day first
       }
-
-      // if dates are equal, sort by urgency (descending)
+    
+      // if same day, sort by urgency descending
       return Number(b.urgency) - Number(a.urgency);
-    });
+    });    
 
   return (
     <div className="category-page">

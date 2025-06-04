@@ -21,6 +21,11 @@ To avoid manual formatting and linting:
 
 ## Commands
 
-- **Run ESLint and Prettier**:  
+- **Run ESLint **:  
   npm run lint
+
 # Personal Fork of CrumbList App
+
+- **Run Prettier **:  
+  npm run format
+

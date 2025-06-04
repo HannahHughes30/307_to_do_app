@@ -22,10 +22,15 @@ export const useProfile = () => {
     } else if (field === 'editTitle') {
       setEditingProfile(prev => ({ ...prev, title: true }));
     } else {
-      setUserProfile(prev => ({ ...prev, [field]: value }));
+      setUserProfile(prev => {
+        const updated = { ...prev, [field]: value };
+        localStorage.setItem('crumblist-profile', JSON.stringify(updated)); 
+        return updated;
+      });
       setEditingProfile(prev => ({ ...prev, [field]: false }));
     }
   };
+  
 
   const handleProfileKeyDown = (e, field) => {
     if (e.key === 'Enter') {
