@@ -26,7 +26,7 @@ const Login = () => {
         localStorage.setItem("token", payload.token);
         setMessage("Login successful; auth token saved");
         alert("Login successful!");
-        navigate("/");
+        navigate("/MyApp");
       } else {
         const errorText = await response.text(); 
         setMessage(`Login Error ${response.status}: ${errorText}`);

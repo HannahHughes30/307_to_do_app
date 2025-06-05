@@ -7,7 +7,9 @@
     "test": "echo \"No tests specified\"",
     "dev": "npx nodemon backend.js",
     "start": "node backend.js",
-    "lint": "echo \"No linting configured\""
+    "lint": "echo \"No linting configured\"",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run"
   },
   "author": "",
   "license": "ISC",

@@ -14,7 +14,8 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<MyApp />} />
+        <Route path="/" element={<Login />} /> 
+        <Route path="/MyApp" element={<MyApp />} />
         <Route path="/add-task" element={<TaskFormPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
