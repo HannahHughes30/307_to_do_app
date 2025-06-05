@@ -69,7 +69,7 @@ function TaskFormPage() {
       .then((newTask) => {
         console.log("Task added successfully:", newTask);
         alert("Task added successfully!");
-        navigate("/");
+        navigate("/MyApp");
       })
       .catch((err) => {
         console.error("Failed to add task:", err);
@@ -82,7 +82,7 @@ function TaskFormPage() {
       <h2 className="form-heading">Add a New Task 📝</h2>
       <TaskInputForm categories={categories} onSubmit={handleFormSubmit} />
       <div className="form-buttons">
-        <button className="back-button" onClick={() => navigate("/")}>
+        <button className="back-button" onClick={() => navigate("/MyApp")}>
           ← Back to CrumbList
         </button>
       </div>
