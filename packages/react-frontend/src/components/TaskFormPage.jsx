@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import TaskInputForm from "./TaskInputForm";
 import { useNavigate } from "react-router-dom";
-import { addAuthHeader } from "./MyApp.jsx";
+import { addAuthHeader } from "../pages/MyApp.jsx";
 
 function TaskFormPage() {
   const navigate = useNavigate();

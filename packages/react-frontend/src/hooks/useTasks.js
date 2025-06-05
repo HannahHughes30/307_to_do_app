@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { addAuthHeader } from "./MyApp.jsx";
+import { addAuthHeader } from "../pages/MyApp.jsx";
 
 export const useTasks = () => {
   const [tasks, setTasks] = useState([]);
@@ -59,7 +59,7 @@ export const useTasks = () => {
 
     // Delete from backend
     checkedTasks.forEach((id) => {
-      fetch("http://localhost:8000/tasks/${id}", {
+      fetch(`http://localhost:8000/tasks/${id}`, {
         method: "DELETE",
         headers: addAuthHeader({
           "Content-Type": "application/json"
