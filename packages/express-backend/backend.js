@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import taskFunction from "./task-functions.js";
 import User from "./models/user.js";
+import { registerUser, authenticateUser, loginUser } from "./auth.js"
 
 dotenv.config();
 
@@ -38,62 +39,66 @@ app.get("/", (req, res) => {
   });
 });
 
-app.post("/login", async (req, res) => {
-  const { username, password } = req.body;
+app.post("/login", loginUser);
 
-  if (!username || !password) {
-    return res.status(400).json({ error: "Username and password required." });
-  }
+// app.post("/login", async (req, res) => {
+//   const { username, password } = req.body;
 
-  try {
-    const user = await User.findOne({ username });
+//   if (!username || !password) {
+//     return res.status(400).json({ error: "Username and password required." });
+//   }
 
-    if (!user) {
-      return res.status(401).json({ error: "User not found." });
-    }
+//   try {
+//     const user = await User.findOne({ username });
 
-    if (user.password !== password) {
-      return res.status(401).json({ error: "Incorrect password." });
-    }
+//     if (!user) {
+//       return res.status(401).json({ error: "User not found." });
+//     }
 
-    // Success!
-    return res
-      .status(200)
-      .json({ message: "Login successful.", user: username });
-  } catch (err) {
-    console.error("Login error:", err);
-    return res.status(500).json({ error: "Server error during login." });
-  }
-});
+//     if (user.password !== password) {
+//       return res.status(401).json({ error: "Incorrect password." });
+//     }
 
-app.post("/signup", async (req, res) => {
-  const { username, password } = req.body;
+//     // Success!
+//     return res
+//       .status(200)
+//       .json({ message: "Login successful.", user: username });
+//   } catch (err) {
+//     console.error("Login error:", err);
+//     return res.status(500).json({ error: "Server error during login." });
+//   }
+// });
 
-  if (!username || !password) {
-    return res
-      .status(400)
-      .json({ error: "Username and password are required." });
-  }
+app.post("/signup", registerUser);
 
-  try {
-    // Check if username already exists
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      return res.status(409).json({ error: "Username already taken." });
-    }
+// app.post("/signup", async (req, res) => {
+//   const { username, password } = req.body;
 
-    // Create and save new user
-    const newUser = new User({ username, password });
-    await newUser.save();
+//   if (!username || !password) {
+//     return res
+//       .status(400)
+//       .json({ error: "Username and password are required." });
+//   }
 
-    return res.status(201).json({ message: "User created successfully." });
-  } catch (err) {
-    console.error("Signup error:", err);
-    return res.status(500).json({ error: "Server error during signup." });
-  }
-});
+//   try {
+//     // Check if username already exists
+//     const existingUser = await User.findOne({ username });
+//     if (existingUser) {
+//       return res.status(409).json({ error: "Username already taken." });
+//     }
 
-app.get("/tasks/:id", (req, res) => {
+//     // Create and save new user
+//     const newUser = new User({ username, password });
+//     await newUser.save();
+
+//     return res.status(201).json({ message: "User created successfully." });
+//   } catch (err) {
+//     console.error("Signup error:", err);
+//     return res.status(500).json({ error: "Server error during signup." });
+//   }
+// });
+
+app.get("/tasks/:id", authenticateUser, (req, res) => {
   taskFunction
     .findTaskById(req.params.id)
     .then((task) => {
@@ -106,7 +111,7 @@ app.get("/tasks/:id", (req, res) => {
     });
 });
 
-app.get("/tasks", (req, res) => {
+app.get("/tasks", authenticateUser, (req, res) => {
   const { due_date, urgency, ease } = req.query;
   taskFunction
     .getTasks(due_date, urgency, ease)
@@ -117,7 +122,7 @@ app.get("/tasks", (req, res) => {
     });
 });
 
-app.post("/tasks", (req, res) => {
+app.post("/tasks", authenticateUser, (req, res) => {
   console.log("Received task data:", req.body);
 
   // Validate required fields
@@ -139,7 +144,7 @@ app.post("/tasks", (req, res) => {
     });
 });
 
-app.delete("/tasks/:id", (req, res) => {
+app.delete("/tasks/:id", authenticateUser, (req, res) => {
   taskFunction
     .deleteTaskById(req.params.id)
     .then((deleted) => {

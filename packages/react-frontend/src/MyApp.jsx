@@ -8,6 +8,15 @@ import { useNavigate, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import CategoryPage from "./CategoryPage";
 
+export function addAuthHeader(otherHeaders = {}) {
+  const token = localStorage.getItem("token");
+  if (!token || token === "INVALID_TOKEN") return otherHeaders;
+  return {
+    ...otherHeaders,
+    Authorization: `Bearer ${token}`
+  };
+}
+
 const EditableCategory = ({
   name,
   index,
@@ -173,18 +182,21 @@ function MyApp() {
 
   // Helper functions
   useEffect(() => {
-    fetch(
-      "https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/tasks",
-    )
+    fetch("http://localhost:8000/tasks", {
+      method: "GET",
+      headers: addAuthHeader({
+        "Content-Type": "application/json"
+      }),
+    })
       .then((res) => res.json())
       .then((json) => {
-        const taskList = Array.isArray(json.task_list) ? json.task_list : [];
-        console.log("✅ Tasks fetched from backend:", taskList); // ← Add this
-        setTasks(taskList);
+        console.log("Fetched tasks:", json.task_list);
+        setTasks(json.task_list || []);
       })
-      .catch((err) => {
-        console.error("Error fetching tasks:", err);
+      .catch((error) => {
+        console.error("Error fetching tasks:", error);
         setTasks([]);
+        navigate("/login");
       });
   }, []);
 
@@ -236,9 +248,12 @@ function MyApp() {
     setCheckedTasks((prev) => prev.filter((id) => !idsToDelete.includes(id)));
     idsToDelete.forEach((id) => {
       fetch(
-        `https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/tasks/${id}`,
+        `http://localhost:8000/tasks/${id}`,
         {
           method: "DELETE",
+          headers: addAuthHeader({
+            "Content-Type": "application/json"
+          }),
         },
       ).catch((err) => console.error("Delete failed", err));
     });

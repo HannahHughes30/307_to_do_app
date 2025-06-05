@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import TaskInputForm from "./TaskInputForm";
 import { useNavigate } from "react-router-dom";
+import { addAuthHeader } from "./MyApp.jsx";
 
 function TaskFormPage() {
   const navigate = useNavigate();
@@ -50,17 +51,14 @@ function TaskFormPage() {
 
   const handleFormSubmit = (task) => {
     console.log("Submitting to backend:", task);
-
-    fetch(
-      "https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/tasks",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(task),
-      },
-    )
+    
+    fetch("http://localhost:8000/tasks", {  
+      method: "POST",
+      headers: addAuthHeader({
+        "Content-Type": "application/json"
+      }),
+      body: JSON.stringify(task),
+    })
       .then((res) => {
         console.log("Response status:", res.status);
         if (!res.ok) {

@@ -6,34 +6,39 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const INVALID_TOKEN = "INVALID_TOKEN";
+  const [token, setToken] = useState(INVALID_TOKEN);
+  const [message, setMessage] = useState("");
 
   const handleSignIn = async () => {
     try {
-      const response = await fetch(
-        "https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, password }),
+      const response = await fetch("http://localhost:8000/login", {//"https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({ username, password }),
+      });
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        alert(`Login failed: ${result.error}`);
-        return;
+      if (response.status === 200) {
+        const payload = await response.json();
+        setToken(payload.token); 
+        localStorage.setItem("token", payload.token);
+        setMessage("Login successful; auth token saved");
+        alert("Login successful!");
+        navigate("/");
+      } else {
+        const errorText = await response.text(); 
+        setMessage(`Login Error ${response.status}: ${errorText}`);
+        alert(`Login failed: ${errorText}`);
       }
-
-      alert("Login successful!");
-      navigate("/");
     } catch (err) {
       console.error("Login error:", err);
+      setMessage(`Login Error: ${err.message}`);
       alert("Something went wrong.");
     }
   };
+
 
   return (
     <div className="login-wrapper">

@@ -30,7 +30,7 @@ function addUser(user) {
 }
 
 function findUserByName(name) {
-  return userModel.find({ name: name });
+  return userModel.findOne({ username: name });
 }
 
 function findUserByJob(job) {

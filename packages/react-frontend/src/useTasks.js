@@ -1,15 +1,22 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { addAuthHeader } from "./MyApp.jsx";
 
 export const useTasks = () => {
   const [tasks, setTasks] = useState([]);
   const [checkedTasks, setCheckedTasks] = useState([]);
   const [progress, setProgress] = useState(0);
+  const navigate = useNavigate();
+  
 
   // Fetch tasks from backend
   const fetchTasks = () => {
-    fetch(
-      "https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/tasks",
-    )
+    fetch("http://localhost:8000/tasks", {
+      method: "GET",
+      headers: addAuthHeader({
+        "Content-Type": "application/json"
+      }),
+    })
       .then((res) => res.json())
       .then((json) => {
         console.log("Fetched tasks:", json.task_list);
@@ -18,6 +25,7 @@ export const useTasks = () => {
       .catch((error) => {
         console.error("Error fetching tasks:", error);
         setTasks([]);
+        navigate("/login");
       });
   };
 
@@ -51,12 +59,12 @@ export const useTasks = () => {
 
     // Delete from backend
     checkedTasks.forEach((id) => {
-      fetch(
-        `https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/tasks/${id}`,
-        {
-          method: "DELETE",
-        },
-      ).catch((err) => console.error("Delete failed", err));
+      fetch("http://localhost:8000/tasks/${id}", {
+        method: "DELETE",
+        headers: addAuthHeader({
+          "Content-Type": "application/json"
+        }),
+      }).catch((err) => console.error("Delete failed", err));
     });
   };
 

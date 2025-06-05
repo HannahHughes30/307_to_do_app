@@ -6,34 +6,37 @@ const Signup = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const INVALID_TOKEN = "INVALID_TOKEN";
+  const [token, setToken] = useState(INVALID_TOKEN);
+  const [message, setMessage] = useState("");
 
   const handleSignup = async () => {
     try {
-      const response = await fetch(
-        "https://crumblist-g5htfcg7afh8ehdw.canadacentral-01.azurewebsites.net/signup",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, password }),
+      const response = await fetch("http://localhost:8000/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({ username, password }),
+      });
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        alert(`Signup failed: ${result.error}`);
-        return;
+    if (response.status === 201) {
+        const payload = await response.json();
+        setToken(payload.token);
+        localStorage.setItem("token", payload.token);
+        setMessage(`Signup successful for user: ${username}; auth token saved`);
+        alert("Signup successful!");
+        navigate("/login"); 
+      } else {
+        const errorText = await response.text(); 
+        setMessage(`Signup Error ${response.status}: ${errorText}`);
+        alert(`Signup failed: ${errorText}`);
       }
-
-      alert("User created successfully!");
-      console.log("Signed up:", result);
-      navigate("/login");
-    } catch (err) {
-      console.error("Signup error:", err);
+    } catch (error) {
+      console.error("Signup error:", error);
+      setMessage(`Signup Error: ${error.message}`);
       alert("Something went wrong during signup.");
-    }
+    } 
   };
 
   return (
