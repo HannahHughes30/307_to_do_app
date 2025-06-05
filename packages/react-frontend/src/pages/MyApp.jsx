@@ -191,6 +191,9 @@ function MyApp() {
               clearCompletedTasks={clearCompletedTasks}
               resetCategoriesToDefault={resetCategoriesToDefault}
               setCategories={setCategories}
+              tasks={tasks}
+              checkedTasks={checkedTasks}
+              completeCheckedTasks={completeCheckedTasks}
             />
           )}
 

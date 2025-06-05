@@ -8,7 +8,44 @@ const SettingsPage = ({
   clearCompletedTasks,
   resetCategoriesToDefault,
   setCategories,
+  tasks,
+  checkedTasks,
+  completeCheckedTasks,
 }) => {
+  const handleClearCompletedTasks = () => {
+    if (checkedTasks.length === 0) {
+      alert("No tasks are currently selected to clear.");
+      return;
+    }
+
+    const confirmClear = window.confirm(
+      `Are you sure you want to permanently delete ${checkedTasks.length} selected task(s)?`
+    );
+    
+    if (confirmClear) {
+      // Complete/remove the checked tasks
+      completeCheckedTasks();
+      alert(`Successfully cleared ${checkedTasks.length} completed task(s)!`);
+    }
+  };
+
+  const handleResetCategories = () => {
+    const defaultCategories = [
+      { name: "School" },
+      { name: "Work" },
+      { name: "Errands" },
+      { name: "Health" },
+      { name: "Fitness" },
+      { name: "Chores" },
+    ];
+    
+    setCategories(defaultCategories);
+    localStorage.setItem("crumblist-categories", JSON.stringify(defaultCategories));
+    
+    // Show confirmation message
+    alert("Categories have been reset to default!");
+  };
+
   return (
     <div className="settings-page">
       <h2>⚙️ Settings</h2>
@@ -102,15 +139,15 @@ const SettingsPage = ({
           <div className="setting-item">
             <button
               className="settings-button danger-btn"
-              onClick={clearCompletedTasks}
+              onClick={handleClearCompletedTasks}
             >
-              🗑️ Clear All Completed Tasks
+              🗑️ Clear Selected Tasks ({checkedTasks.length})
             </button>
           </div>
           <div className="setting-item">
             <button
               className="settings-button warning-btn"
-              onClick={() => resetCategoriesToDefault(setCategories)}
+              onClick={handleResetCategories}
             >
               🔄 Reset Categories to Default
             </button>
@@ -134,6 +171,9 @@ SettingsPage.propTypes = {
   clearCompletedTasks: PropTypes.func.isRequired,
   resetCategoriesToDefault: PropTypes.func.isRequired,
   setCategories: PropTypes.func.isRequired,
+  tasks: PropTypes.array,
+  checkedTasks: PropTypes.array,
+  completeCheckedTasks: PropTypes.func,
 };
 
 export default SettingsPage;
