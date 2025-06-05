@@ -52,5 +52,7 @@ To avoid manual formatting and linting:
         npm run dev
 
 - ✅ **Class (Data Model) Diagrams**  
- [view UML diagram here:] (https://app.diagrams.net/#Lcrumblistuml.drawio#%7B%22pageId%22%3A%22e7e014a7-5840-1c2e-5031-d8a46d1fe8dd%22%7D)
 
+You can view the UML diagram here:  
+[📄 crumblistuml.drawio.pdf](docs/crumblistuml.drawio.pdf)
+Last updated 6/1
