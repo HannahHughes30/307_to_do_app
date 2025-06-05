@@ -1,4 +1,3 @@
-// logic only, manages the user profle
 
 import { useState, useEffect } from "react";
 
@@ -18,7 +17,6 @@ export const useProfile = () => {
     title: false,
   });
 
-  // Save profile to localStorage
   useEffect(() => {
     localStorage.setItem("crumblist-profile", JSON.stringify(userProfile));
   }, [userProfile]);

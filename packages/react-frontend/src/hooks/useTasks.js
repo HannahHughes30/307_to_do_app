@@ -9,7 +9,6 @@ export const useTasks = () => {
   const navigate = useNavigate();
   
 
-  // Fetch tasks from backend
   const fetchTasks = () => {
     fetch("http://localhost:8000/tasks", {
       method: "GET",
@@ -33,7 +32,6 @@ export const useTasks = () => {
     fetchTasks();
   }, []);
 
-  // Calculate progress
   useEffect(() => {
     const total = tasks.length;
     const completed = checkedTasks.length;
@@ -57,7 +55,6 @@ export const useTasks = () => {
     setTasks(updatedTasks);
     setCheckedTasks([]);
 
-    // Delete from backend
     checkedTasks.forEach((id) => {
       fetch(`http://localhost:8000/tasks/${id}`, {
         method: "DELETE",

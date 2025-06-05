@@ -30,7 +30,6 @@ function MyApp() {
   const { tasks, checkedTasks, progress, toggleChecked, completeCheckedTasks } =
     useTasks();
 
-  // Custom hooks
   const {
     settings,
     updateSetting,
@@ -46,14 +45,12 @@ function MyApp() {
     handleProfileKeyDown,
   } = useProfile();
 
-  // Quote state
   const [quote, setQuote] = useState(() => {
     const randomQuote =
       breadQuotes[Math.floor(Math.random() * breadQuotes.length)];
     return `${randomQuote} – Mr. Crumb`;
   });
 
-  // Categories state
   const [categories, setCategories] = useState(() => {
     const saved = localStorage.getItem("crumblist-categories");
     return saved
@@ -68,7 +65,6 @@ function MyApp() {
         ];
   });
 
-  // Task filtering
   const butterTasks = tasks
     .filter((task) => Number(task.ease) < settings.butterThreshold)
     .sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
@@ -95,12 +91,10 @@ function MyApp() {
     categories,
   );
 
-  // Save categories
   useEffect(() => {
     localStorage.setItem("crumblist-categories", JSON.stringify(categories));
   }, [categories]);
 
-  // Apply themes
   useEffect(() => {
     document.body.className = `theme-${settings.colorTheme} ${settings.darkMode ? "dark-mode" : ""}`;
     const pinkBg = document.querySelector(".pink-background");
@@ -109,7 +103,6 @@ function MyApp() {
     }
   }, [settings.darkMode, settings.colorTheme]);
 
-  // Sidebar outside click
   useEffect(() => {
     function handleClickOutside(e) {
       if (sidebarRef.current && !sidebarRef.current.contains(e.target)) {

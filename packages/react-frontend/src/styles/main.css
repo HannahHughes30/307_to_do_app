@@ -1440,8 +1440,8 @@ caption {
 .sidebar {
   position: fixed;
   top: 0;
-  left: -250px;
-  width: 220px;
+  left: -350px;
+  width: 350px;
   height: 100vh;
   background-color: #3e2c24;
   color: white;
@@ -1468,7 +1468,7 @@ caption {
 .sidebar ul {
   list-style: none;
   padding: 0;
-  margin-top: 50px;
+  margin-top: 70px;
 }
 
 .sidebar li {

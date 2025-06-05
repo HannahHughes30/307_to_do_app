@@ -7,13 +7,11 @@ function TaskFormPage() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
 
-  // Get categories from localStorage (same as MyApp)
   useEffect(() => {
     const savedCategories = localStorage.getItem("crumblist-categories");
     if (savedCategories) {
       setCategories(JSON.parse(savedCategories));
     } else {
-      // Default categories (same as MyApp)
       setCategories([
         { name: "School" },
         { name: "Work" },
@@ -24,7 +22,6 @@ function TaskFormPage() {
       ]);
     }
 
-    // Listen for storage changes (when categories are updated in MyApp)
     const handleStorageChange = (e) => {
       if (e.key === "crumblist-categories") {
         setCategories(JSON.parse(e.newValue));
@@ -33,7 +30,6 @@ function TaskFormPage() {
 
     window.addEventListener("storage", handleStorageChange);
 
-    // Also listen for focus (when returning from MyApp)
     const handleFocus = () => {
       const updatedCategories = localStorage.getItem("crumblist-categories");
       if (updatedCategories) {

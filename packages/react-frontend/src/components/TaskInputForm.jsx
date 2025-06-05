@@ -11,9 +11,7 @@ const TaskInputForm = ({ onSubmit, categories }) => {
     urgency: "",
   });
 
-  // Update form when categories change
   useEffect(() => {
-    // If current selected category no longer exists, clear it
     if (
       task.category &&
       !categories.some((cat) => cat.name === task.category)
@@ -30,7 +28,6 @@ const TaskInputForm = ({ onSubmit, categories }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Map frontend fields to backend schema
     const backendTask = {
       name: task.title,
       category: task.category,
@@ -45,7 +42,6 @@ const TaskInputForm = ({ onSubmit, categories }) => {
     console.log("Submitting task:", backendTask);
     onSubmit(backendTask);
 
-    // Clear form
     setTask({
       title: "",
       dueDate: "",
@@ -56,7 +52,6 @@ const TaskInputForm = ({ onSubmit, categories }) => {
     });
   };
 
-  // Filter out categories with empty names
   const validCategories = categories.filter(
     (cat) => cat.name && cat.name.trim() !== "",
   );
